@@ -43,8 +43,13 @@ async def web_search_tool(query: str, max_results: int = 5) -> str:
         print(f"DEBUG: DuckDuckGo Search error: {e}")
             
     # 3. If everything fails
+    error_msg = "All search providers failed."
+    if google_api_key and google_cse_id:
+        # If we had keys but failed, execution failure is likely the cause
+        error_msg += " (Google Search failed, and DuckDuckGo fallback failed)"
+        
     return json.dumps({
-        "error": "All search providers failed.",
+        "error": error_msg,
         "results": []
     })
 
