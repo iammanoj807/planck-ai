@@ -53,7 +53,7 @@ function App() {
         if (window.innerWidth < 1024) setSidebarOpen(false)
 
         try {
-            const response = await fetch(`http://localhost:8000/conversations/${conversationId}`)
+            const response = await fetch(`/conversations/${conversationId}`)
             const data = await response.json()
             setMessages(data.messages || [])
         } catch (error) {
@@ -74,7 +74,7 @@ function App() {
         setActiveConversation(conversationId)
 
         // Refresh conversations list
-        fetch('http://localhost:8000/conversations')
+        fetch('/conversations')
             .then(res => res.json())
             .then(data => setConversations(data.conversations || []))
             .catch(console.error)
@@ -83,7 +83,7 @@ function App() {
     // Delete conversation permanently
     const handleDeleteConversation = useCallback(async (conversationId) => {
         try {
-            await fetch(`http://localhost:8000/conversations/${conversationId}`, {
+            await fetch(`/conversations/${conversationId}`, {
                 method: 'DELETE'
             })
 
@@ -100,7 +100,7 @@ function App() {
 
     // Load conversations list on initial mount
     useEffect(() => {
-        fetch('http://localhost:8000/conversations')
+        fetch('/conversations')
             .then(res => res.json())
             .then(data => setConversations(data.conversations || []))
             .catch(console.error)
