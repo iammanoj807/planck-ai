@@ -49,7 +49,7 @@ export default function Sidebar({
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-pplx-accent flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity" title="Planck AI">
                         <Sparkles className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-xl font-serif font-medium text-pplx-text tracking-wide flex items-center gap-1">Planck <span className="text-pplx-accent">AI</span> <Sparkles className="w-3 h-3 text-cyan-400" /></span>
+                    <span className="text-xl font-serif font-medium text-pplx-text tracking-wide flex items-center gap-1">Planck <span className="text-pplx-accent">AI</span></span>
                 </div>
             </div>
 
