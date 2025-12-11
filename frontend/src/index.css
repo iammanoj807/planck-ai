@@ -1,0 +1,229 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  /* Base size */
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #191A1A;
+  /* pplx-dark */
+  color: #E8E8E8;
+  /* pplx-text */
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar styling - Minimal */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2E3030;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3F4141;
+}
+
+/* Utility Classes for Perplexity Look */
+.bg-pplx-dark {
+  background-color: #191A1A;
+}
+
+.bg-pplx-card {
+  background-color: #202222;
+}
+
+.bg-pplx-hover {
+  background-color: #2C2D2D;
+}
+
+.glass-card {
+  background: #191A1A;
+  /* Seamless */
+  border: 1px solid #2E3030;
+}
+
+.glass-card-light {
+  background: #2C2D2D;
+  border: 1px solid #2E3030;
+}
+
+/* Typography Scale */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #F8F8F8;
+  letter-spacing: -0.01em;
+}
+
+p {
+  line-height: 1.6;
+  color: #D1D1D1;
+}
+
+/* Button styles */
+.btn-primary {
+  background: #2BB0AF;
+  /* Teal accent */
+  color: white;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: #249695;
+}
+
+.btn-secondary {
+  background: #202222;
+  color: #E8E8E8;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #2C2D2D;
+}
+
+/* Message bubbles - Minimalist */
+.message-user {
+  background: #202222;
+  border-radius: 12px;
+}
+
+.message-assistant {
+  background: transparent;
+  padding-left: 0;
+}
+
+/* Tool call indicator */
+.tool-indicator {
+  background: #202222;
+  border: 1px solid #2E3030;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+/* Typing indicator */
+.typing-indicator span {
+  width: 4px;
+  height: 4px;
+  background: #8C8C8C;
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+/* Code block styling */
+.code-block {
+  background: #151616;
+  border: 1px solid #2E3030;
+  border-radius: 6px;
+  padding: 12px;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+/* Markdown content */
+/* Markdown content */
+.markdown-content>*+* {
+  margin-top: 1em;
+}
+
+.markdown-content p {
+  line-height: 1.7;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.markdown-content li {
+  margin-bottom: 0.3em;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+  color: #F8F8F8;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid #309aa5;
+  padding-left: 1em;
+  color: #A0A0A0;
+  margin: 1em 0;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+.markdown-content code {
+  font-family: 'Menlo', 'Monaco', monospace;
+  background: #2C2D2D;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: #E8E8E8;
+  border: 1px solid #2E3030;
+}
+
+/* Animation */
+@keyframes typing {
+
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
