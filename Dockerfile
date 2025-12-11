@@ -27,6 +27,9 @@ COPY backend/ ./backend
 # Copy Frontend Build from Stage 1
 COPY --from=frontend-build /app/frontend/dist ./frontend/dist
 
+# Set Python path to find backend modules
+ENV PYTHONPATH=/app/backend
+
 # Expose port 7860 (Standard for HF Spaces)
 EXPOSE 7860
 
