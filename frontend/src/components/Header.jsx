@@ -17,7 +17,7 @@ export default function Header({ onToggleSidebar, onNewChat }) {
                         <Sparkles className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold gradient-text">Planck AI</h1>
+                        <h1 className="text-xl font-bold gradient-text flex items-center gap-1">Planck AI <Sparkles className="w-3 h-3 text-cyan-400" /></h1>
                         <p className="text-xs text-pplx-muted">Autonomous Reasoning Engine</p>
                     </div>
                 </div>

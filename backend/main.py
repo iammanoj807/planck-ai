@@ -43,36 +43,6 @@ memory = ConversationMemory()
 UPLOAD_DIR = Path(__file__).parent / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True, parents=True)
 
-# -------------------------------------------------------------------------
-# Static File Serving (For Production/Docker)
-# -------------------------------------------------------------------------
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-
-# Helper to find static directory (handles local run vs docker structure)
-# In Docker, we copied dist to ./backend/static, so it's relative to main.py
-static_dir = Path(__file__).parent / "static"
-
-if static_dir.exists():
-    app.mount("/assets", StaticFiles(directory=static_dir / "assets"), name="assets")
-    
-    # Catch-all for React Router (SPA)
-    @app.get("/{full_path:path}")
-    async def serve_frontend(full_path: str):
-        # Allow API routes to pass through
-        if full_path.startswith("api/") or full_path.startswith("docs") or full_path.startswith("openapi.json"):
-             raise HTTPException(status_code=404)
-             
-        # Check if file exists in static (e.g. favicon.ico, plain images)
-        file_path = static_dir / full_path
-        if file_path.exists() and file_path.is_file():
-             return FileResponse(file_path)
-             
-        # Fallback to index.html for React Routes
-        return FileResponse(static_dir / "index.html")
-else:
-    print("WARNING: Static directory not found. Frontend will not be served (API Only Mode).")
-
 
 # Request/Response models
 class ChatRequest(BaseModel):
@@ -252,6 +222,46 @@ def delete_conversation(conversation_id: str):
     if success:
         return {"status": "success"}
     raise HTTPException(status_code=404, detail="Conversation not found or could not be deleted")
+
+# -------------------------------------------------------------------------
+# Static Files & SPA Handling (Production/Docker)
+# -------------------------------------------------------------------------
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# Check for frontend build
+frontend_dist = Path("frontend/dist")
+
+if frontend_dist.exists():
+    # Mount assets
+    app.mount("/assets", StaticFiles(directory=frontend_dist / "assets"), name="assets")
+    
+    # Manifest and other root files
+    @app.get("/manifest.json")
+    async def manifest():
+        return FileResponse(frontend_dist / "manifest.json")
+        
+    @app.get("/favicon.ico")
+    async def favicon():
+        # Fallback if favicon isn't in root
+        if (frontend_dist / "favicon.ico").exists():
+            return FileResponse(frontend_dist / "favicon.ico")
+        return {"error": "not found"}
+
+    # Catch-all for SPA (must be last)
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        # Skip API routes (handled above)
+        if full_path.startswith("api"):
+            raise HTTPException(status_code=404, detail="API route not found")
+        
+        # Check if file exists (e.g. manoj.png)
+        file_path = frontend_dist / full_path
+        if file_path.exists() and file_path.is_file():
+            return FileResponse(file_path)
+            
+        # Default to index.html for React Router
+        return FileResponse(frontend_dist / "index.html")
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

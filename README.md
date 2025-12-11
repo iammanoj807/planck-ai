@@ -1,6 +1,6 @@
 ---
 title: Planck AI
-emoji: 🧠
+emoji: 🪐
 colorFrom: gray
 colorTo: blue
 sdk: docker
