@@ -15,8 +15,6 @@ pinned: false
 
 Planck AI is an advanced agentic search interface that combines the reasoning power of **GPT-4o** and **GPT-4o Mini** with real-time web access. Unlike traditional chatbots, Planck AI thinks before it speaks—breaking down complex queries into steps, searching multiple sources, reading deep into documents, and verifying facts before giving you an answer.
 
-
-
 ## 🚀 Features
 
 - **🧠 Agentic Reasoning**: Uses a multi-step "Thinking" process to plan, execute, and verify tasks.
@@ -74,7 +72,7 @@ Contributions are welcome! Please fork the repository and submit a Pull Request.
 
 ## 📄 License
 
-MIT License. See [LICENSE](LICENSE) for details.
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
