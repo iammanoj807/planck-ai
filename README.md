@@ -8,14 +8,14 @@ app_port: 7860
 pinned: false
 ---
 
-# Planck AI
+# Planck AI <img src="frontend/public/planck-logo.svg" width="40" height="40" align="center" />
 
 > **Your Autonomous Reasoning Engine for the Web.**
 > *Think. Search. Solve.*
 
 Planck AI is an advanced agentic search interface that combines the reasoning power of **GPT-4o** and **GPT-4o Mini** with real-time web access. Unlike traditional chatbots, Planck AI thinks before it speaks—breaking down complex queries into steps, searching multiple sources, reading deep into documents, and verifying facts before giving you an answer.
 
-![Planck AI Dashboard](frontend/public/planck-logo.svg)
+
 
 ## 🚀 Features
 
