@@ -99,7 +99,7 @@ export default function MessageBubble({ message }) {
     const displayContent = getDisplayContent()
 
     return (
-        <div className={`flex gap-3 animate-fade-in ${isUser ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex gap-3 group animate-fade-in ${isUser ? 'flex-row-reverse' : ''}`}>
             {/* Avatar */}
             <div className={`
         w-9 h-9 rounded-xl flex-shrink-0 flex items-center justify-center
@@ -154,27 +154,9 @@ export default function MessageBubble({ message }) {
                         </div>
                     )}
                     {isUser ? (
-                        <div className="relative group">
-                            <p className="text-white whitespace-pre-wrap break-words">
-                                {displayContent}
-                            </p>
-                            <button
-                                onClick={() => handleCopyCode(displayContent, `msg-${message.id}`)}
-                                className="absolute -left-8 md:-left-12 top-0 p-1.5 text-zinc-500 hover:text-white opacity-0 group-hover:opacity-100 transition-all"
-                                title="Copy message"
-                            >
-                                {copiedIndex === `msg-${message.id}` ? (
-                                    <Check className="w-4 h-4 text-green-400" />
-                                ) : (
-                                    <Copy className="w-4 h-4" />
-                                )}
-                            </button>
-                        </div>
-                    ) : effectiveRateLimit ? (
-                        <div className="text-slate-200">
-                            <span className="font-medium text-red-300">API Rate Limit Hit. </span>
-                            <span className="text-sm opacity-90">Retrying allowed in: {formatTime(timeLeft)}</span>
-                        </div>
+                        <p className="text-white whitespace-pre-wrap break-words">
+                            {displayContent}
+                        </p>
                     ) : (
                         <div className={`markdown-content ${isError ? 'text-red-300' : 'text-slate-200'}`}>
                             <ReactMarkdown
@@ -272,7 +254,29 @@ export default function MessageBubble({ message }) {
                         </div>
                     )}
                 </div>
+
+                {/* Copy Button (Option 2: Below the bubble) */}
+                {isUser && (
+                    <div className="flex justify-end mt-1.5 mr-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                        <button
+                            onClick={() => handleCopyCode(displayContent, `msg-${message.id}`)}
+                            className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white transition-colors px-2 py-1 rounded hover:bg-white/5"
+                        >
+                            {copiedIndex === `msg-${message.id}` ? (
+                                <>
+                                    <Check className="w-3.5 h-3.5 text-green-400" />
+                                    <span className="text-green-400">Copied</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Copy className="w-3.5 h-3.5" />
+                                    <span>Copy</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
             </div>
-        </div>
+        </div >
     )
 }
