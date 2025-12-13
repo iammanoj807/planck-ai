@@ -160,7 +160,7 @@ export default function MessageBubble({ message }) {
                             </p>
                             <button
                                 onClick={() => handleCopyCode(displayContent, `msg-${message.id}`)}
-                                className="absolute -left-12 top-0 p-1.5 text-zinc-500 hover:text-white opacity-0 group-hover:opacity-100 transition-all"
+                                className="absolute -left-8 md:-left-12 top-0 p-1.5 text-zinc-500 hover:text-white opacity-0 group-hover:opacity-100 transition-all"
                                 title="Copy message"
                             >
                                 {copiedIndex === `msg-${message.id}` ? (
