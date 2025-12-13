@@ -216,6 +216,19 @@ export default function ChatInterface({
                             setStreamingMessage(' ') // Initialize bubble
 
                             const typeChar = (index) => {
+                                // If user switches tabs (document hidden), finish immediately
+                                if (document.hidden) {
+                                    setStreamingMessage('')
+                                    onAddMessage({
+                                        id: Date.now().toString(),
+                                        role: 'assistant',
+                                        content: fullContent,
+                                        toolCalls: accumulatedToolCalls,
+                                        model: selectedModel
+                                    })
+                                    return
+                                }
+
                                 if (index < fullContent.length) {
                                     currentText += fullContent[index]
                                     setStreamingMessage(currentText)

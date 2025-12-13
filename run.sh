@@ -7,6 +7,13 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}🚀 Starting Planck AI...${NC}"
 
+# Cleanup existing processes
+echo -e "${BLUE}🧹 Cleaning up ports 8000 and 5173...${NC}"
+lsof -t -i :8000 | xargs kill -9 2>/dev/null
+lsof -t -i :5173 | xargs kill -9 2>/dev/null
+
+sleep 1
+
 # Start Backend
 echo -e "${GREEN}📦 Setting up Backend...${NC}"
 cd backend
