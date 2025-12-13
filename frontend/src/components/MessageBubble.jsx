@@ -154,9 +154,22 @@ export default function MessageBubble({ message }) {
                         </div>
                     )}
                     {isUser ? (
-                        <p className="text-white whitespace-pre-wrap break-words">
-                            {displayContent}
-                        </p>
+                        <div className="relative group">
+                            <p className="text-white whitespace-pre-wrap break-words">
+                                {displayContent}
+                            </p>
+                            <button
+                                onClick={() => handleCopyCode(displayContent, `msg-${message.id}`)}
+                                className="absolute -left-12 top-0 p-1.5 text-zinc-500 hover:text-white opacity-0 group-hover:opacity-100 transition-all"
+                                title="Copy message"
+                            >
+                                {copiedIndex === `msg-${message.id}` ? (
+                                    <Check className="w-4 h-4 text-green-400" />
+                                ) : (
+                                    <Copy className="w-4 h-4" />
+                                )}
+                            </button>
+                        </div>
                     ) : effectiveRateLimit ? (
                         <div className="text-slate-200">
                             <span className="font-medium text-red-300">API Rate Limit Hit. </span>
