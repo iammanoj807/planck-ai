@@ -157,7 +157,7 @@ export default function Sidebar({
                         </button>
                     </div>
                     <p className="text-[10px] text-pplx-muted/60 text-center mt-1">
-                        {selectedModel === 'gpt-4o' ? 'High Intelligence • 100k Context' : 'High Speed • 12k Context'}
+                        {selectedModel === 'gpt-4o' ? 'High Intelligence • 8k Token Limit' : 'High Speed • 8k Token Limit'}
                     </p>
                 </div>
             </div>

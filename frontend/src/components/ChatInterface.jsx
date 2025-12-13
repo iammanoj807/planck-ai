@@ -262,6 +262,13 @@ export default function ChatInterface({
                                     isRateLimit: true,
                                     retryAfter: waitTimeCurrent
                                 })
+                            } else if (errorMsg.includes('tokens_limit_reached') || errorMsg.includes('413')) {
+                                onAddMessage({
+                                    id: Date.now().toString(),
+                                    role: 'assistant',
+                                    content: "**Message Limit Reached (Free Tier)**\n\nYour message or conversation history exceeds the 8,000 token limit allowed by the free GitHub Models API.\n\n**Solution:**\n- Start a new chat to clear history.\n- Shorten your input message.",
+                                    isError: true
+                                })
                             } else {
                                 onAddMessage({
                                     id: Date.now().toString(),

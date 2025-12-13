@@ -192,12 +192,9 @@ class AgentRunner:
         
         # Smart Context Management
         # Dynamic limit based on model capacity
-        if model_name == "gpt-4o":
-            # GPT-4o (128k context) -> ~100k history
-            MAX_HISTORY_CHARS = 100000
-        else:
-            # GPT-4o Mini (8k limit) -> ~12k history
-            MAX_HISTORY_CHARS = 12000
+        # Github Models Free Tier has a strict 8k token limit for ALL models
+        # 8k tokens ~= 32k chars. We use 30k to be safe.
+        MAX_HISTORY_CHARS = 30000
             
         current_chars = 0
         selected_history = []

@@ -84,6 +84,20 @@ export default function MessageBubble({ message }) {
     // Show bottom reasoning IF it's consistent and NOT running (completed)
     const showBottomReasoning = !isThinkingRunning && Array.isArray(toolCalls) && toolCalls.length > 0
 
+    // Unified content processing for both User and Assistant
+    const getDisplayContent = () => {
+        const content = message.content || ''
+        if (content.includes('tokens_limit_reached') || content.includes('413')) {
+            return "**Message Limit Reached (Free Tier)**\n\nConversation history exceeds the 8k token limit.\n\n**Solution:** Please start a new chat."
+        }
+        if (isUser) {
+            return content.replace(/^\[Mode: .*?\]\s*/, '')
+        }
+        return content
+    }
+
+    const displayContent = getDisplayContent()
+
     return (
         <div className={`flex gap-3 animate-fade-in ${isUser ? 'flex-row-reverse' : ''}`}>
             {/* Avatar */}
@@ -140,8 +154,8 @@ export default function MessageBubble({ message }) {
                         </div>
                     )}
                     {isUser ? (
-                        <p className="text-white whitespace-pre-wrap">
-                            {message.content.replace(/^\[Mode: .*?\]\s*/, '')}
+                        <p className="text-white whitespace-pre-wrap break-words">
+                            {displayContent}
                         </p>
                     ) : effectiveRateLimit ? (
                         <div className="text-slate-200">
@@ -235,7 +249,7 @@ export default function MessageBubble({ message }) {
                                     }
                                 }}
                             >
-                                {message.content}
+                                {displayContent}
                             </ReactMarkdown>
                             {!isUser && (showBottomReasoning || message.model) && (
                                 <div className="mt-4 pt-3">

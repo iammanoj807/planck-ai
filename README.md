@@ -32,6 +32,13 @@ Planck AI is an advanced agentic search interface that combines the reasoning po
 - **Vector Store**: ChromaDB (In-memory for session context)
 - **Deployment**: Docker, Hugging Face Spaces
 
+## ⚠️ API Limitations (Free Tier)
+
+This project uses the **GitHub Models API (Free Tier)** for AI inference.
+- **Token Limit**: Both GPT-4o and GPT-4o Mini are capped at a strict **8k token context window** ~~(standard is 128k)~~.
+- **Handling**: The application automatically manages this by truncating conversation history to ~30k characters to prevent overflow errors.
+- **Upgrade**: To unlock full 128k context, configure a paid OpenAI/Azure API key in the backend.
+
 ## 📦 Installation (Local)
 
 1. **Clone the repository**

@@ -141,7 +141,8 @@ async def chat(request: ChatRequest):
                 tool_calls.append(chunk["metadata"])
             elif chunk["type"] == "error":
                 # Signal frontend that processing is complete
-                pass # No explicit action needed here, the error chunk is already yielded
+                # Also save the error to memory so it doesn't disappear on reload
+                full_response = f"**Error:** {chunk['content']}"
                 
         # Save assistant response to memory (only if not an error)
         if full_response:
