@@ -25,7 +25,7 @@ export default function HeroSection({
 
 
             {/* Disclaimer */}
-            <div className="absolute bottom-6 left-0 right-0 text-center space-y-2 animate-fade-in">
+            <div className="absolute bottom-6 left-0 right-0 text-center space-y-2 animate-fade-in px-6">
                 <p className="text-sm text-pplx-muted">
                     Planck AI can make mistakes. Verify important information.
                 </p>
