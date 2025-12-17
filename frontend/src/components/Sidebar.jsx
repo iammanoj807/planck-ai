@@ -19,17 +19,31 @@ export default function Sidebar({
     selectedModel,
     onSelectModel
 }) {
-    // Format date for display
+    // Format date for display (UK London time)
     const formatDate = (dateString) => {
         if (!dateString) return ''
-        const date = new Date(dateString)
-        const now = new Date()
-        const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24))
+        try {
+            const date = new Date(dateString)
+            // Format time in 24h for London timezone
+            const timeStr = date.toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZone: 'Europe/London'
+            })
+            // Format date with ordinal suffix
+            const day = date.toLocaleDateString('en-GB', { day: 'numeric', timeZone: 'Europe/London' })
+            const month = date.toLocaleDateString('en-GB', { month: 'short', timeZone: 'Europe/London' })
+            const year = date.toLocaleDateString('en-GB', { year: 'numeric', timeZone: 'Europe/London' })
 
-        if (diffDays === 0) return 'Today'
-        if (diffDays === 1) return 'Yesterday'
-        if (diffDays < 7) return `${diffDays} days ago`
-        return date.toLocaleDateString()
+            // Add ordinal suffix (1st, 2nd, 3rd, etc.)
+            const dayNum = parseInt(day)
+            const suffix = ['th', 'st', 'nd', 'rd'][(dayNum % 100 > 10 && dayNum % 100 < 14) ? 0 : (dayNum % 10 < 4) ? dayNum % 10 : 0]
+
+            return `${timeStr} · ${dayNum}${suffix} ${month}, ${year}`
+        } catch {
+            return ''
+        }
     }
 
     return (
@@ -100,7 +114,7 @@ export default function Sidebar({
                                         <MessageSquare className="w-4 h-4 text-pplx-text" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-pplx-text truncate">
+                                        <p className="text-lg font-medium text-pplx-text truncate">
                                             {conv.title || 'New Conversation'}
                                         </p>
                                         <p className="text-xs text-pplx-muted mt-1">

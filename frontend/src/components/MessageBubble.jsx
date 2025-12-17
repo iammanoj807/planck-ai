@@ -124,7 +124,7 @@ export default function MessageBubble({ message }) {
             </div>
 
             {/* Message content */}
-            <div className={`max-w-[85%] ${isUser ? 'items-end' : 'items-start w-full'}`}>
+            <div className={`max-w-[85%] overflow-hidden ${isUser ? 'items-end' : 'items-start w-full'}`}>
                 {/* Files preview for user messages */}
                 {message.files && message.files.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-2">
@@ -158,7 +158,7 @@ export default function MessageBubble({ message }) {
                             {displayContent}
                         </p>
                     ) : (
-                        <div className={`markdown-content ${isError ? 'text-red-300' : 'text-slate-200'}`}>
+                        <div className={`markdown-content max-w-full overflow-hidden ${isError ? 'text-red-300' : 'text-slate-200'}`}>
                             <ReactMarkdown
                                 components={{
                                     code({ node, inline, className, children, ...props }) {
@@ -173,7 +173,7 @@ export default function MessageBubble({ message }) {
                                         }
 
                                         return (
-                                            <div className="my-4 rounded-lg overflow-hidden border border-[#2E3030] bg-[#1E1E1E]">
+                                            <div className="my-4 rounded-lg overflow-hidden border border-[#2E3030] bg-[#1E1E1E] max-w-full w-full">
                                                 {/* Code Header */}
                                                 <div className="flex items-center justify-between px-3 py-2 bg-[#252526] border-b border-[#2E3030]">
                                                     <div className="flex items-center gap-2">
@@ -200,7 +200,7 @@ export default function MessageBubble({ message }) {
                                                     </button>
                                                 </div>
                                                 {/* Code Body */}
-                                                <div className="overflow-x-auto text-[15px] bg-[#1E1E1E]">
+                                                <div className="overflow-x-auto text-[15px] bg-[#1E1E1E]" style={{ maxWidth: 'calc(100vw - 6rem)' }}>
                                                     <SyntaxHighlighter
                                                         style={(() => {
                                                             const theme = { ...vscDarkPlus }
@@ -248,7 +248,7 @@ export default function MessageBubble({ message }) {
                             </ReactMarkdown>
                             {!isUser && (showBottomReasoning || message.model) && (
                                 <div className="mt-4 pt-3">
-                                    <ReasoningPanel toolCalls={toolCalls} model={message.model} />
+                                    <ReasoningPanel toolCalls={toolCalls} model={message.model} timestamp={message.timestamp} />
                                 </div>
                             )}
                         </div>

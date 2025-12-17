@@ -61,6 +61,9 @@ class ConversationMemory:
             for k, v in metadata.items():
                 if isinstance(v, (str, int, float, bool)):
                     msg_metadata[k] = v
+                elif isinstance(v, (list, dict)):
+                    # Serialize complex types as JSON strings
+                    msg_metadata[k] = json.dumps(v)
         
         self.messages_collection.add(
             ids=[message_id],
@@ -84,12 +87,24 @@ class ConversationMemory:
         messages = []
         if results["ids"]:
             for i, msg_id in enumerate(results["ids"]):
+                msg_metadata = results["metadatas"][i]
+                
+                # Deserialize JSON-serialized metadata
+                tool_calls = []
+                if "tool_calls" in msg_metadata:
+                    try:
+                        tool_calls = json.loads(msg_metadata["tool_calls"])
+                    except (json.JSONDecodeError, TypeError):
+                        pass
+                
                 messages.append({
                     "id": msg_id,
                     "content": results["documents"][i],
-                    "role": results["metadatas"][i].get("role", "user"),
-                    "timestamp": results["metadatas"][i].get("timestamp"),
-                    "metadata": results["metadatas"][i]
+                    "role": msg_metadata.get("role", "user"),
+                    "timestamp": msg_metadata.get("timestamp"),
+                    "model": msg_metadata.get("model"),
+                    "toolCalls": tool_calls,
+                    "metadata": msg_metadata
                 })
                 
         # Sort by timestamp

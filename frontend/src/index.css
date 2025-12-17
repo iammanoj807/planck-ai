@@ -210,6 +210,41 @@ p {
   font-size: 0.85em;
   color: #E8E8E8;
   border: 1px solid #2E3030;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Prevent overflow for all markdown content */
+.markdown-content {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.markdown-content pre {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.markdown-content a {
+  word-break: break-all;
+}
+
+/* Ensure message bubbles don't overflow */
+.message-user,
+.message-assistant {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Force all text content to wrap */
+p,
+span,
+div {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 /* Animation */

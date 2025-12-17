@@ -137,8 +137,23 @@ async def chat(request: ChatRequest):
             # Collect response
             if chunk["type"] == "response":
                 full_response = chunk["content"]
+            elif chunk["type"] == "thinking":
+                # Save the thinking step so it appears on reload
+                tool_data = {
+                    "tool": "thinking",
+                    "input": {"query": "Analyzing request..."},
+                    "status": "complete"
+                }
+                if not any(t.get("tool") == "thinking" for t in tool_calls):
+                    tool_calls.append(tool_data)
             elif chunk["type"] == "tool_call":
-                tool_calls.append(chunk["metadata"])
+                # Include status and tool name for frontend ReasoningPanel compatibility
+                tool_data = {
+                    "tool": chunk["metadata"].get("tool"),
+                    "input": chunk["metadata"].get("input"),
+                    "status": "complete"  # All saved tools are complete
+                }
+                tool_calls.append(tool_data)
             elif chunk["type"] == "error":
                 # Signal frontend that processing is complete
                 # Also save the error to memory so it doesn't disappear on reload
@@ -150,7 +165,7 @@ async def chat(request: ChatRequest):
                 conversation_id,
                 "assistant",
                 full_response,
-                metadata={"tool_calls": tool_calls}
+                metadata={"tool_calls": tool_calls, "model": request.model}
             )
             
         # Send done signal
