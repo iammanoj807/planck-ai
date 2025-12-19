@@ -11,13 +11,13 @@ def thinking_tool(thought: str) -> str:
 
 THINKING_TOOL_DEF = {
     "name": "thinking",
-    "description": "Call this tool FIRST to explain your plan, hypothesis, or reasoning process before taking any action.",
+    "description": "Briefly outline your plan before taking action.",
     "parameters": {
         "type": "object",
         "properties": {
             "thought": {
                 "type": "string",
-                "description": "The detailed reasoning, plan, or analysis of the user's request."
+                "description": "Your brief plan (1-2 sentences max)"
             }
         },
         "required": ["thought"]

@@ -4,6 +4,7 @@ import { User, Bot, AlertCircle, Image, FileText, Clock, Check, Copy, Terminal }
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import ReasoningPanel from './ReasoningPanel'
+import RateLimitCountdown from './RateLimitCountdown'
 
 /**
  * Message Bubble Component
@@ -22,51 +23,7 @@ export default function MessageBubble({ message }) {
     const isRateLimit = message.isRateLimit
     const toolCalls = message.toolCalls || []
 
-    const [timeLeft, setTimeLeft] = useState(message.retryAfter || 0)
     const [copiedIndex, setCopiedIndex] = useState(null)
-
-    // Hydrate countdown if a rate limit message is loaded from history without strict props
-    useEffect(() => {
-        if (!isRateLimit && message.content) {
-            const match = message.content.match(/Retrying allowed in: (\d+)s/)
-            if (match) {
-                const originalWait = parseInt(match[1])
-                // Calculate elapsed time if timestamp exists
-                let elapsed = 0
-                if (message.timestamp) {
-                    const msgTime = new Date(message.timestamp).getTime()
-                    elapsed = Math.floor((Date.now() - msgTime) / 1000)
-                }
-
-                const remaining = Math.max(0, originalWait - elapsed)
-                setTimeLeft(remaining)
-            }
-        }
-    }, [message.content, message.timestamp, isRateLimit])
-
-    // Countdown timer effect
-    useEffect(() => {
-        if (timeLeft <= 0) return
-
-        const timer = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    clearInterval(timer)
-                    return 0
-                }
-                return prev - 1
-            })
-        }, 1000)
-
-        return () => clearInterval(timer)
-    }, [timeLeft])
-
-    const formatTime = (seconds) => {
-        const h = Math.floor(seconds / 3600)
-        const m = Math.floor((seconds % 3600) / 60)
-        const s = seconds % 60
-        return `${h > 0 ? `${h}h ` : ''}${m > 0 ? `${m}m ` : ''}${s}s`
-    }
 
     const handleCopyCode = (code, index) => {
         navigator.clipboard.writeText(code)
@@ -75,7 +32,9 @@ export default function MessageBubble({ message }) {
     }
 
     // Check if effective rate limit (prop or hydrated)
-    const effectiveRateLimit = isRateLimit || (message.content && message.content.includes("Retrying allowed in:"))
+    const rateLimitMatch = message.content && message.content.match(/Retrying allowed in: (\d+)s/)
+    const rateLimitSeconds = rateLimitMatch ? parseInt(rateLimitMatch[1]) : 0
+    const effectiveRateLimit = isRateLimit || rateLimitSeconds > 0
 
     // Thinking state analysis
     const isThinkingRunning = Array.isArray(toolCalls) && toolCalls.some(t => t.status === 'running')
@@ -157,6 +116,8 @@ export default function MessageBubble({ message }) {
                         <p className="text-white whitespace-pre-wrap break-words">
                             {displayContent}
                         </p>
+                    ) : effectiveRateLimit ? (
+                        <RateLimitCountdown initialSeconds={rateLimitSeconds} />
                     ) : (
                         <div className={`markdown-content max-w-full overflow-hidden ${isError ? 'text-red-300' : 'text-slate-200'}`}>
                             <ReactMarkdown
