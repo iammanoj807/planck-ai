@@ -137,15 +137,6 @@ async def chat(request: ChatRequest):
             # Collect response
             if chunk["type"] == "response":
                 full_response = chunk["content"]
-            elif chunk["type"] == "thinking":
-                # Save the thinking step so it appears on reload
-                tool_data = {
-                    "tool": "thinking",
-                    "input": {"query": "Analyzing request..."},
-                    "status": "complete"
-                }
-                if not any(t.get("tool") == "thinking" for t in tool_calls):
-                    tool_calls.append(tool_data)
             elif chunk["type"] == "tool_call":
                 # Include status and tool name for frontend ReasoningPanel compatibility
                 tool_data = {

@@ -114,7 +114,7 @@ export default function Sidebar({
                                         <MessageSquare className="w-4 h-4 text-pplx-text" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-lg font-medium text-pplx-text truncate">
+                                        <p className="text-base font-medium text-pplx-text truncate">
                                             {conv.title || 'New Conversation'}
                                         </p>
                                         <p className="text-xs text-pplx-muted mt-1">

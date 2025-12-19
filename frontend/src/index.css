@@ -202,6 +202,11 @@ p {
   font-weight: 600;
 }
 
+/* Hide horizontal rules in chat */
+.markdown-content hr {
+  display: none;
+}
+
 .markdown-content code {
   font-family: 'Menlo', 'Monaco', monospace;
   background: #2C2D2D;

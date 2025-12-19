@@ -85,6 +85,38 @@ export default function ReasoningPanel({ toolCalls, model }) {
                         const isToolRunning = toolCall.status === 'running'
                         const isToolExpanded = expandedTools[index]
 
+                        if (toolCall.tool === 'thinking') {
+                            const isThinkingRunning = toolCall.status === 'running'
+                            return (
+                                <div key={index} className="group">
+                                    <button
+                                        onClick={() => toggleTool(index)}
+                                        className="w-full flex items-center justify-between text-left hover:bg-white/5 p-1.5 rounded transition-colors"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <BrainCircuit className={`w-3.5 h-3.5 ${isThinkingRunning ? 'text-pplx-accent animate-pulse' : 'text-slate-400'}`} />
+                                            <span className="text-sm text-slate-300 font-medium">Thinking Process</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            {isToolExpanded ? (
+                                                <ChevronDown className="w-3 h-3 text-slate-500" />
+                                            ) : (
+                                                <ChevronRight className="w-3 h-3 text-slate-500" />
+                                            )}
+                                        </div>
+                                    </button>
+
+                                    {isToolExpanded && (
+                                        <div className="mt-1.5 ml-6">
+                                            <div className="text-sm text-slate-300 border-l-2 border-slate-700 pl-3 py-1 italic">
+                                                {toolCall.input?.thought || "Analyzing request..."}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        }
+
                         return (
                             <div key={index} className="group">
                                 {/* Tool Header */}

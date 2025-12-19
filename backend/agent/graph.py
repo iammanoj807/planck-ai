@@ -14,10 +14,13 @@ from tools.web_search import web_search_tool, WEB_SEARCH_TOOL_DEF
 from tools.code_executor import code_executor_tool, CODE_EXECUTOR_TOOL_DEF
 from tools.image_analyzer import image_analyzer_tool, IMAGE_ANALYZER_TOOL_DEF
 from tools.document_reader import document_reader_tool, DOCUMENT_READER_TOOL_DEF
+from tools.thinking import thinking_tool, THINKING_TOOL_DEF
 
 
 # Tool definitions for the model
+# Tool definitions for the model
 TOOLS = [
+    THINKING_TOOL_DEF,
     WEB_SEARCH_TOOL_DEF,
     CODE_EXECUTOR_TOOL_DEF,
     IMAGE_ANALYZER_TOOL_DEF,
@@ -26,6 +29,7 @@ TOOLS = [
 
 # Tools allowed in Chat Mode (No Web Search)
 CHAT_TOOLS = [
+    THINKING_TOOL_DEF,
     IMAGE_ANALYZER_TOOL_DEF,
     DOCUMENT_READER_TOOL_DEF
 ]
@@ -146,6 +150,8 @@ class AgentRunner:
             return await image_analyzer_tool(**tool_input)
         elif tool_name == "document_reader":
             return await document_reader_tool(**tool_input)
+        elif tool_name == "thinking":
+            return thinking_tool(**tool_input)
         else:
             return json.dumps({"error": f"Unknown tool: {tool_name}"})
             
