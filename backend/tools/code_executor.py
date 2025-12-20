@@ -34,8 +34,6 @@ def code_executor_tool(code: str, language: str = "python") -> str:
     language = language.lower()
     
     result = {
-        "code": code,
-        "language": language,
         "stdout": "",
         "stderr": "",
         "result": None,

@@ -232,6 +232,17 @@ export default function ReasoningPanel({ toolCalls, model }) {
                                                             // Result is often a JSON string, try to parse it
                                                             const parsed = typeof toolCall.result === 'string' ? JSON.parse(toolCall.result) : toolCall.result
 
+                                                            // Check if result is empty or effectively empty
+                                                            const hasOutput = parsed.stdout || parsed.stderr || parsed.error
+
+                                                            if (!hasOutput && parsed.success) {
+                                                                return (
+                                                                    <div className="font-mono text-[10px] text-zinc-500 italic px-2">
+                                                                        No output returned (Success)
+                                                                    </div>
+                                                                )
+                                                            }
+
                                                             return (
                                                                 <div className="font-mono text-[10px]">
                                                                     {/* STDOUT */}
@@ -263,9 +274,9 @@ export default function ReasoningPanel({ toolCalls, model }) {
                                                                 </div>
                                                             )
                                                         } catch (e) {
-                                                            // Fallback if parsing fails
+                                                            // If parsing fails, showing the raw string is better than nothing, but let's try to prettify it if it looks like JSON
                                                             return (
-                                                                <code className="text-slate-300 whitespace-pre-wrap font-mono max-h-40 overflow-y-auto block custom-scrollbar">
+                                                                <code className="text-slate-300 whitespace-pre-wrap font-mono max-h-40 overflow-y-auto block custom-scrollbar text-[10px]">
                                                                     {toolCall.result}
                                                                 </code>
                                                             )
