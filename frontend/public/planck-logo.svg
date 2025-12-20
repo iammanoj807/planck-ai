@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#309aa5;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Rect -->
+  <rect x="0" y="0" width="32" height="32" rx="6" fill="url(#grad)" />
+  
+  <!-- Content Group: Centered, Stroke-based (Lucide Style) -->
+  <g transform="translate(16, 16)" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    
+    <!-- Main Star (Center) - Drawn from center (0,0) relative to group -->
+    <!-- Shape: 4-pointed star. Points at (0,-7), (2, -2), (7,0), (2,2), (0,7), (-2,2), (-7,0), (-2,-2) -->
+    <!-- Actually standard Lucide star is a bit sharper, using curves? No, straight lines usually. -->
+    <path d="M0 -7 L1.5 -1.5 L7 0 L1.5 1.5 L0 7 L-1.5 1.5 L-7 0 L-1.5 -1.5 Z" />
+    
+    <!-- Small Star (Top Left) at (-8, -8) -->
+    <g transform="translate(-8, -8)">
+      <path d="M0 -3 L0.7 -0.7 L3 0 L0.7 0.7 L0 3 L-0.7 0.7 L-3 0 L-0.7 -0.7 Z" stroke-width="1.5" />
+    </g>
+
+    <!-- Small Star (Bottom Right) at (7, 7) -->
+    <g transform="translate(6, 6)">
+       <path d="M0 -2.5 L0.6 -0.6 L2.5 0 L0.6 0.6 L0 2.5 L-0.6 0.6 L-2.5 0 L-0.6 -0.6 Z" stroke-width="1.5" />
+    </g>
+    
+  </g>
+</svg>
