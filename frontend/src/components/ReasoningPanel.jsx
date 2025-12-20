@@ -145,20 +145,79 @@ export default function ReasoningPanel({ toolCalls, model }) {
                                 {/* Tool Details */}
                                 {isToolExpanded && (
                                     <div className="mt-1.5 ml-6 space-y-2 text-xs">
+                                        {/* Custom Input Renderer */}
                                         {toolCall.input && (
                                             <div className="bg-[#1e1e1e] p-2 rounded border border-white/10">
                                                 <div className="text-slate-500 mb-1">Input</div>
-                                                <code className="text-slate-300 whitespace-pre-wrap font-mono">
-                                                    {JSON.stringify(toolCall.input, null, 2)}
-                                                </code>
+                                                {toolCall.tool === 'web_search' && toolCall.input.query ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <Search className="w-3 h-3 text-pplx-accent" />
+                                                        <span className="text-slate-300">Query:</span>
+                                                        <span className="text-white font-medium">{toolCall.input.query}</span>
+                                                    </div>
+                                                ) : toolCall.tool === 'document_reader' && toolCall.input.source ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <FileText className="w-3 h-3 text-blue-400" />
+                                                        <span className="text-slate-300">Source:</span>
+                                                        <a href={toolCall.input.source} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline truncate max-w-[300px]">
+                                                            {toolCall.input.source}
+                                                        </a>
+                                                    </div>
+                                                ) : (
+                                                    <code className="text-slate-300 whitespace-pre-wrap font-mono">
+                                                        {JSON.stringify(toolCall.input, null, 2)}
+                                                    </code>
+                                                )}
                                             </div>
                                         )}
+
+                                        {/* Custom Result Renderer */}
                                         {toolCall.result && (
                                             <div className="bg-[#1e1e1e] p-2 rounded border border-white/10">
                                                 <div className="text-slate-500 mb-1">Result</div>
-                                                <code className="text-slate-300 whitespace-pre-wrap font-mono max-h-40 overflow-y-auto block custom-scrollbar">
-                                                    {toolCall.result}
-                                                </code>
+                                                {toolCall.tool === 'web_search' && typeof toolCall.result === 'string' ? (
+                                                    <div className="space-y-2">
+                                                        {toolCall.result.split('Title: ').slice(1).map((item, i) => {
+                                                            const parts = item.split('\n')
+                                                            const title = parts[0]
+                                                            const urlLine = parts.find(p => p.trim().startsWith('URL: '))
+                                                            const url = urlLine ? urlLine.replace('URL: ', '').trim() : '#'
+                                                            const descLine = parts.find(p => p.trim().startsWith('Description: '))
+                                                            const desc = descLine ? descLine.replace('Description: ', '').trim() : ''
+
+                                                            return (
+                                                                <div key={i} className="bg-white/5 p-2 rounded border border-white/5 hover:border-white/20 transition-colors">
+                                                                    <a href={url} target="_blank" rel="noopener noreferrer" className="block font-medium text-pplx-accent hover:underline mb-0.5 truncate">
+                                                                        {title}
+                                                                    </a>
+                                                                    <div className="text-[10px] text-slate-500 truncate mb-1">{url}</div>
+                                                                    <div className="text-slate-300 line-clamp-2">{desc}</div>
+                                                                </div>
+                                                            )
+                                                        })}
+                                                        {/* Fallback if parsing fails or result is empty */}
+                                                        {(!toolCall.result.includes('Title: ')) && (
+                                                            <code className="text-slate-300 whitespace-pre-wrap font-mono block max-h-40 overflow-y-auto custom-scrollbar">
+                                                                {toolCall.result}
+                                                            </code>
+                                                        )}
+                                                    </div>
+                                                ) : toolCall.tool === 'document_reader' && typeof toolCall.result === 'string' ? (
+                                                    <div className="text-slate-300">
+                                                        <div className="flex items-center gap-2 mb-2 text-green-400">
+                                                            <CheckCircle2 className="w-3 h-3" />
+                                                            <span>Content extracted successfully</span>
+                                                        </div>
+                                                        <div className="bg-black/20 p-2 rounded text-slate-400 font-mono text-[10px] max-h-32 overflow-y-auto custom-scrollbar">
+                                                            {toolCall.result.slice(0, 500)}
+                                                            {toolCall.result.length > 500 && '...'}
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <code className="text-slate-300 whitespace-pre-wrap font-mono max-h-40 overflow-y-auto block custom-scrollbar">
+                                                        {toolCall.result}
+                                                    </code>
+                                                )}
                                             </div>
                                         )}
                                     </div>
