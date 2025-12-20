@@ -2,7 +2,7 @@
 Code Executor Tool
 
 This module run code in a safe(ish) local environment.
-Supported languages: Python, JavaScript, Java, C, C++, C#, Go, Rust, TypeScript.
+Supported languages: Python, JavaScript, Java, C, C++, Go, TypeScript.
 
 WARNING: This is a risky tool if not sandboxed. In this demo, it runs on the host machine.
 Python runs in-process (restricted).
@@ -26,7 +26,7 @@ def code_executor_tool(code: str, language: str = "python") -> str:
     
     Args:
         code (str): Source code to execute.
-        language (str): python, javascript, java, c, cpp, csharp, go, rust, typescript
+        language (str): python, javascript, java, c, cpp, go, typescript
         
     Returns:
         str: Captured stdout/stderr or error message.
@@ -54,12 +54,8 @@ def code_executor_tool(code: str, language: str = "python") -> str:
             return _execute_c(code, result)
         elif language in ["cpp", "c++"]:
             return _execute_cpp(code, result)
-        elif language in ["csharp", "c#"]:
-            return _execute_csharp(code, result)
         elif language == "go":
             return _execute_go(code, result)
-        elif language == "rust":
-            return _execute_rust(code, result)
         else:
             return json.dumps({"error": f"Unsupported language: {language}"})
 
@@ -212,42 +208,7 @@ def _execute_go(code: str, result: Dict[str, Any]) -> str:
     return json.dumps(result, indent=2)
 
 
-def _execute_rust(code: str, result: Dict[str, Any]) -> str:
-    with tempfile.TemporaryDirectory() as temp_dir:
-        src = os.path.join(temp_dir, "main.rs")
-        exe = os.path.join(temp_dir, "main")
-        with open(src, "w") as f: f.write(code)
-        
-        stdout, stderr, rc = _run_subprocess(["rustc", "main.rs", "-o", "main"], cwd=temp_dir)
-        if rc != 0:
-            result["stderr"] = stderr
-            result["error"] = "Compilation Failed"
-            return json.dumps(result, indent=2)
-            
-        stdout, stderr, rc = _run_subprocess([exe], cwd=temp_dir)
-        result["stdout"], result["stderr"] = stdout, stderr
-        result["success"] = rc == 0
-    return json.dumps(result, indent=2)
 
-
-def _execute_csharp(code: str, result: Dict[str, Any]) -> str:
-    with tempfile.TemporaryDirectory() as temp_dir:
-        src = os.path.join(temp_dir, "Program.cs")
-        exe = os.path.join(temp_dir, "Program.exe")
-        with open(src, "w") as f: f.write(code)
-        
-        # Use mcs (Mono Compiler)
-        stdout, stderr, rc = _run_subprocess(["mcs", "Program.cs"], cwd=temp_dir)
-        if rc != 0:
-            result["stderr"] = stderr
-            result["error"] = "Compilation Failed (Ensure mono-complete is installed)"
-            return json.dumps(result, indent=2)
-        
-        # Run with mono
-        stdout, stderr, rc = _run_subprocess(["mono", "Program.exe"], cwd=temp_dir)
-        result["stdout"], result["stderr"] = stdout, stderr
-        result["success"] = rc == 0
-    return json.dumps(result, indent=2)
 
 
 # Tool definition for LangChain
@@ -264,7 +225,7 @@ CODE_EXECUTOR_TOOL_DEF = {
             "language": {
                 "type": "string",
                 "description": "Programming language to use",
-                "enum": ["python", "javascript", "typescript", "java", "c", "cpp", "csharp", "go", "rust"],
+                "enum": ["python", "javascript", "typescript", "java", "c", "cpp", "go"],
                 "default": "python"
             }
         },

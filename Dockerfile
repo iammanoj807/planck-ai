@@ -29,8 +29,6 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     npm \
     golang-go \
-    rustc \
-    mono-complete \
     && rm -rf /var/lib/apt/lists/*
 
 # Install TypeScript runner (globally available for code_executor)
