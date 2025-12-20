@@ -30,6 +30,7 @@ TOOLS = [
 # Tools allowed in Chat Mode (No Web Search)
 CHAT_TOOLS = [
     THINKING_TOOL_DEF,
+    CODE_EXECUTOR_TOOL_DEF,
     IMAGE_ANALYZER_TOOL_DEF,
     DOCUMENT_READER_TOOL_DEF
 ]
