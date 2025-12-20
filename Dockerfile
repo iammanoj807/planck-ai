@@ -32,7 +32,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ backend/
 
 # Set Python path
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app:/app/backend
 
 # Expose port
 EXPOSE 8000
