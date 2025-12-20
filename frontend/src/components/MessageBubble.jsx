@@ -168,8 +168,30 @@ export default function MessageBubble({ message }) {
                                         // Stable ID based on content length + first 10 chars to prevent re-render mismatches
                                         const index = `code-${codeString.length}-${codeString.substring(0, 10).replace(/\s/g, '')}`
 
-                                        if (inline) {
-                                            return <code className="bg-cyan-500/10 px-1.5 py-0.5 rounded text-cyan-300" {...props}>{children}</code>
+                                        const numLines = codeString.split('\n').length
+
+                                        // Force inline style for single-line code blocks to prevent layout disruption forms single words
+                                        if (inline || numLines === 1) {
+                                            return <code className="bg-cyan-500/10 px-1.5 py-0.5 rounded text-cyan-300 font-mono text-[13px]" {...props}>{children}</code>
+                                        }
+
+                                        // Heuristic: If code is short (2 lines), render a minimal block without the heavy header
+                                        if (numLines <= 2) {
+                                            return (
+                                                <div className="my-2 rounded-md overflow-hidden border border-[#2E3030] bg-[#1E1E1E] max-w-full w-full group relative inline-block align-middle">
+                                                    <div className="overflow-x-auto text-[14px] bg-[#1E1E1E] px-3 py-2">
+                                                        <code className="font-mono text-slate-200 whitespace-pre-wrap">{codeString}</code>
+                                                    </div>
+                                                    {/* Copy button appears on hover for short blocks */}
+                                                    <button
+                                                        onClick={() => handleCopyCode(codeString, index)}
+                                                        className="absolute top-1 right-1 p-1 rounded-md bg-black/50 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-white"
+                                                        title="Copy"
+                                                    >
+                                                        {copiedIndex === index ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                                                    </button>
+                                                </div>
+                                            )
                                         }
 
                                         return (

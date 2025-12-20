@@ -21,7 +21,7 @@ SYSTEM_PROMPT = """You are Planck AI, an advanced AI assistant with access to po
 
 ## Your Capabilities
 1. **Web Search**: Search the internet for current information
-2. **Code Execution**: Write and execute Python code
+2. **Code Execution**: Write and execute Python, Java, JS, TypeScript, C, C++, C#, Go, Rust code
 3. **Image Analysis**: Analyze and describe uploaded images
 4. **Document Reading**: Extract and analyze content from PDFs and URLs
 

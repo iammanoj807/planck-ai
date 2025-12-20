@@ -1,38 +1,41 @@
-# Stage 1: Build Frontend
-FROM node:18-alpine as frontend-build
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
-RUN npm install
-COPY frontend/ ./
-RUN npm run build
-
-# Stage 2: Runtime
+# Use Python 3.11 as base
 FROM python:3.11-slim
+
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies and compilers
+# - build-essential: gcc, g++, make
+# - default-jdk: Java
+# - nodejs/npm: JavaScript/TypeScript
+# - golang: Go
+# - rustc: Rust
+# - mono-complete: C#
 RUN apt-get update && apt-get install -y \
-    tesseract-ocr \
-    poppler-utils \
-    libgl1 \
+    build-essential \
+    default-jdk \
+    nodejs \
+    npm \
+    golang-go \
+    rustc \
+    mono-complete \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python deps
+# Install TypeScript runner globally
+RUN npm install -g ts-node typescript
+
+# Copy requirements first for caching
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy Backend Code
-COPY backend/ ./backend
+# Copy backend code
+COPY backend/ backend/
 
-# Copy Frontend Build from Stage 1
-COPY --from=frontend-build /app/frontend/dist ./frontend/dist
+# Set Python path
+ENV PYTHONPATH=/app
 
-# Set Python path to find backend modules
-ENV PYTHONPATH=/app/backend
+# Expose port
+EXPOSE 8000
 
-# Expose port 7860 (Standard for HF Spaces)
-EXPOSE 7860
-
-# Run the app
-# Note: We run from root, so module is backend.main
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "7860"]
+# Run the application
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

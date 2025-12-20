@@ -163,6 +163,19 @@ export default function ReasoningPanel({ toolCalls, model }) {
                                                             {toolCall.input.source}
                                                         </a>
                                                     </div>
+                                                ) : toolCall.tool === 'code_executor' && toolCall.input.code ? (
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-2 text-[10px] text-slate-500 mb-1">
+                                                            <Code className="w-3 h-3" />
+                                                            <span>Language:</span>
+                                                            <span className="text-pplx-accent font-medium uppercase">{toolCall.input.language || 'python'}</span>
+                                                        </div>
+                                                        <div className="relative">
+                                                            <pre className="text-slate-300 font-mono text-[10px] whitespace-pre-wrap overflow-x-auto custom-scrollbar bg-black/30 p-2 rounded max-h-48">
+                                                                {toolCall.input.code}
+                                                            </pre>
+                                                        </div>
+                                                    </div>
                                                 ) : (
                                                     <code className="text-slate-300 whitespace-pre-wrap font-mono">
                                                         {JSON.stringify(toolCall.input, null, 2)}
@@ -213,6 +226,51 @@ export default function ReasoningPanel({ toolCalls, model }) {
                                                             {toolCall.result.length > 500 && '...'}
                                                         </div>
                                                     </div>
+                                                ) : toolCall.tool === 'code_executor' ? (
+                                                    (() => {
+                                                        try {
+                                                            // Result is often a JSON string, try to parse it
+                                                            const parsed = typeof toolCall.result === 'string' ? JSON.parse(toolCall.result) : toolCall.result
+
+                                                            return (
+                                                                <div className="font-mono text-[10px]">
+                                                                    {/* STDOUT */}
+                                                                    {parsed.stdout && (
+                                                                        <div className="mb-2">
+                                                                            <div className="text-slate-500 text-[9px] mb-0.5 uppercase tracking-wider">Output</div>
+                                                                            <div className="bg-black/40 p-2 rounded text-green-400 border-l-2 border-green-500/50 whitespace-pre-wrap">
+                                                                                {parsed.stdout}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {/* STDERR */}
+                                                                    {parsed.stderr && (
+                                                                        <div className="mb-2">
+                                                                            <div className="text-red-400/80 text-[9px] mb-0.5 uppercase tracking-wider">Standard Error</div>
+                                                                            <div className="bg-red-950/20 p-2 rounded text-red-300 border-l-2 border-red-500/50 whitespace-pre-wrap">
+                                                                                {parsed.stderr}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {/* General Error */}
+                                                                    {parsed.error && (
+                                                                        <div className="bg-red-500/10 p-2 rounded text-red-400 border border-red-500/20 flex gap-2 items-start mt-2">
+                                                                            <span className="font-bold">Error:</span> {parsed.error}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )
+                                                        } catch (e) {
+                                                            // Fallback if parsing fails
+                                                            return (
+                                                                <code className="text-slate-300 whitespace-pre-wrap font-mono max-h-40 overflow-y-auto block custom-scrollbar">
+                                                                    {toolCall.result}
+                                                                </code>
+                                                            )
+                                                        }
+                                                    })()
                                                 ) : (
                                                     <code className="text-slate-300 whitespace-pre-wrap font-mono max-h-40 overflow-y-auto block custom-scrollbar">
                                                         {toolCall.result}
