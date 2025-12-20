@@ -21,8 +21,6 @@ WORKDIR /app
 # - default-jdk: Java
 # - nodejs/npm: JavaScript/TypeScript execution (runtime)
 # - golang: Go
-# - rustc: Rust
-# - mono-complete: C#
 RUN apt-get update && apt-get install -y \
     build-essential \
     default-jdk \

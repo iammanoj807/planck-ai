@@ -98,6 +98,24 @@ export default function MessageBubble({ message }) {
 
     const displayContent = getDisplayContent()
 
+    // Rate Limit View
+    if (effectiveRateLimit) {
+        return (
+            <div className="flex justify-center my-4 animate-fade-in w-full">
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex flex-col items-center gap-2 min-w-[300px]">
+                    <Clock className="w-6 h-6 text-red-400 mb-1" />
+                    <div className="text-red-200 font-medium text-lg">API Rate Limit. Retry in:</div>
+                    <div className="font-mono text-3xl font-bold text-red-400 tabular-nums tracking-wider">
+                        {formatTime(timeLeft)}
+                    </div>
+                    <div className="text-xs text-red-400/60 mt-1 uppercase tracking-widest font-semibold">
+                        Retry Countdown
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className={`flex gap-3 group animate-fade-in ${isUser ? 'flex-row-reverse' : ''}`}>
             {/* Avatar */}
