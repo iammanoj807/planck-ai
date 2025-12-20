@@ -1,13 +1,25 @@
-# Use Python 3.11 as base
+# -----------------------------------------------------------------------------
+# Stage 1: Build Frontend
+# -----------------------------------------------------------------------------
+FROM node:18-slim AS frontend-builder
+
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm install
+COPY frontend/ ./
+RUN npm run build
+
+# -----------------------------------------------------------------------------
+# Stage 2: Runtime Environment (Backend + Static Frontend)
+# -----------------------------------------------------------------------------
 FROM python:3.11-slim
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies and compilers
+# Install System Dependencies & Compilers for Code Execution
 # - build-essential: gcc, g++, make
 # - default-jdk: Java
-# - nodejs/npm: JavaScript/TypeScript
+# - nodejs/npm: JavaScript/TypeScript execution (runtime)
 # - golang: Go
 # - rustc: Rust
 # - mono-complete: C#
@@ -21,21 +33,25 @@ RUN apt-get update && apt-get install -y \
     mono-complete \
     && rm -rf /var/lib/apt/lists/*
 
-# Install TypeScript runner globally
+# Install TypeScript runner (globally available for code_executor)
 RUN npm install -g ts-node typescript
 
-# Copy requirements first for caching
+# Install Python Dependencies
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
+# Copy Backend Code
 COPY backend/ backend/
 
-# Set Python path
+# Copy Built Frontend from Stage 1
+# Backend expects it at /app/frontend/dist
+COPY --from=frontend-builder /app/dist /app/frontend/dist
+
+# Set permissions and path
 ENV PYTHONPATH=/app:/app/backend
 
-# Expose port
-EXPOSE 8000
+# Expose Hugging Face compatible port
+EXPOSE 7860
 
 # Run the application
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "7860"]
