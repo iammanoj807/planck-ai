@@ -201,13 +201,14 @@ export default function ChatInterface({
 
                         } else if (data.type === 'response') {
                             // Complete any hanging thinking state
-                            const completeThinking = calls => calls.map(tc =>
-                                tc.tool === 'thinking' && tc.status === 'running'
-                                    ? { ...tc, status: 'complete', result: 'Analysis complete' }
+                            // Complete ALL hanging tool states (thinking or actual tools)
+                            const completeAllTools = calls => calls.map(tc =>
+                                tc.status === 'running'
+                                    ? { ...tc, status: 'complete', result: tc.result || 'Completed' }
                                     : tc
                             )
-                            setToolCalls(prev => completeThinking(prev))
-                            accumulatedToolCalls = completeThinking(accumulatedToolCalls)
+                            setToolCalls(prev => completeAllTools(prev))
+                            accumulatedToolCalls = completeAllTools(accumulatedToolCalls)
 
                             // Implement Typing Effect for aesthetic smoothness
                             setStreamingMessage('')
