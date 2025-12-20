@@ -372,7 +372,7 @@ export default function ChatInterface({
 
             {/* Fixed input area (only shows when messages exist) */}
             {(messages.length > 0 || isLoading) && (
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-pplx-dark via-pplx-dark/95 to-transparent z-10">
+                <div className="absolute bottom-0 left-0 right-0 p-2 md:p-4 bg-gradient-to-t from-pplx-dark via-pplx-dark/95 to-transparent z-10">
                     <div className="max-w-4xl mx-auto">
                         {renderInputArea(false)}
                         <div className="text-center mt-3 space-y-1">

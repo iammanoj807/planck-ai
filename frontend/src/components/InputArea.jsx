@@ -81,12 +81,12 @@ export default function InputArea({
               w-full bg-transparent border-0 text-pplx-text placeholder-pplx-muted 
               focus:ring-0 focus:outline-none resize-none py-3 px-2
               max-h-[200px] overflow-y-auto custom-scrollbar
-              ${centered ? 'text-base text-left font-medium' : 'text-sm'}
+              ${centered ? 'text-base text-left font-medium' : 'text-base md:text-sm'}
             `}
                         style={{ minHeight: centered ? '50px' : '44px' }}
                     />
 
-                    <div className="flex items-center justify-between px-2 pb-1">
+                    <div className="flex flex-wrap items-center justify-between px-2 pb-1 gap-y-2">
                         {/* Focus Dropdown */}
                         <div className="relative">
                             <button

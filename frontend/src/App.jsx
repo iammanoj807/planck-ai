@@ -150,7 +150,7 @@ function App() {
                 </button>
 
                 {/* Chat area */}
-                <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
+                <main className={`flex-1 min-w-0 w-full transition-all duration-300 ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
                     <ChatInterface
                         conversationId={activeConversation}
                         messages={messages}
