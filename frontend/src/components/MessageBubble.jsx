@@ -108,9 +108,6 @@ export default function MessageBubble({ message }) {
                     <div className="font-mono text-3xl font-bold text-red-400 tabular-nums tracking-wider">
                         {formatTime(timeLeft)}
                     </div>
-                    <div className="text-xs text-red-400/60 mt-1 uppercase tracking-widest font-semibold">
-                        Retry Countdown
-                    </div>
                 </div>
             </div>
         )
