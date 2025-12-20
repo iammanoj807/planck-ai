@@ -130,7 +130,7 @@ export default function Sidebar({
                                     e.stopPropagation()
                                     onDeleteConversation(conv.id)
                                 }}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md text-pplx-muted hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md text-pplx-muted hover:text-red-400 hover:bg-red-500/10 transition-all"
                                 title="Delete conversation"
                             >
                                 <Trash2 className="w-4 h-4" />
@@ -144,30 +144,41 @@ export default function Sidebar({
             <div className="p-4 border-t border-white/5">
                 <div className="flex flex-col gap-2">
                     <p className="text-xs font-medium text-pplx-muted px-1">AI Model Strategy</p>
-                    <div className="grid grid-cols-2 gap-1 bg-black/20 p-1 rounded-lg border border-white/5">
+                    <div className="bg-black/20 p-1 rounded-lg border border-white/5 space-y-1">
                         <button
                             onClick={() => onSelectModel('gpt-4o-mini')}
                             className={`
-                                flex items-center justify-center gap-2 py-2 px-3 rounded-md text-xs font-medium transition-all
+                                w-full flex items-center justify-between px-3 py-2 rounded-md transition-all group
                                 ${selectedModel === 'gpt-4o-mini'
-                                    ? 'bg-pplx-accent/10 text-pplx-accent border border-pplx-accent/20'
-                                    : 'text-pplx-muted hover:text-white hover:bg-white/5'}
+                                    ? 'bg-pplx-accent/10 border border-pplx-accent/20'
+                                    : 'hover:bg-white/5 border border-transparent'}
                             `}
                         >
-                            <Zap className={`w-3 h-3 ${selectedModel === 'gpt-4o-mini' ? 'fill-current' : ''}`} />
-                            <span>GPT-4o Mini</span>
+                            <div className="flex items-center gap-2">
+                                <Zap className={`w-3.5 h-3.5 ${selectedModel === 'gpt-4o-mini' ? 'text-pplx-accent fill-pplx-accent' : 'text-slate-500 group-hover:text-slate-300'}`} />
+                                <div className="text-left">
+                                    <div className={`text-xs font-medium ${selectedModel === 'gpt-4o-mini' ? 'text-pplx-accent' : 'text-slate-400 group-hover:text-slate-200'}`}>GPT-4o Mini</div>
+                                </div>
+                            </div>
+                            {selectedModel === 'gpt-4o-mini' && <div className="w-1.5 h-1.5 rounded-full bg-pplx-accent" />}
                         </button>
+
                         <button
                             onClick={() => onSelectModel('gpt-4o')}
                             className={`
-                                flex items-center justify-center gap-2 py-2 px-3 rounded-md text-xs font-medium transition-all
+                                w-full flex items-center justify-between px-3 py-2 rounded-md transition-all group
                                 ${selectedModel === 'gpt-4o'
-                                    ? 'bg-pplx-accent/10 text-pplx-accent border border-pplx-accent/20'
-                                    : 'text-pplx-muted hover:text-white hover:bg-white/5'}
+                                    ? 'bg-pplx-accent/10 border border-pplx-accent/20'
+                                    : 'hover:bg-white/5 border border-transparent'}
                             `}
                         >
-                            <Brain className={`w-3 h-3 ${selectedModel === 'gpt-4o' ? 'fill-current' : ''}`} />
-                            <span>GPT-4o</span>
+                            <div className="flex items-center gap-2">
+                                <Brain className={`w-3.5 h-3.5 ${selectedModel === 'gpt-4o' ? 'text-pplx-accent' : 'text-slate-500 group-hover:text-slate-300'}`} />
+                                <div className="text-left">
+                                    <div className={`text-xs font-medium ${selectedModel === 'gpt-4o' ? 'text-pplx-accent' : 'text-slate-400 group-hover:text-slate-200'}`}>GPT-4o</div>
+                                </div>
+                            </div>
+                            {selectedModel === 'gpt-4o' && <div className="w-1.5 h-1.5 rounded-full bg-pplx-accent" />}
                         </button>
                     </div>
                     <p className="text-[10px] text-pplx-muted/60 text-center mt-1">
