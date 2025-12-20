@@ -88,7 +88,7 @@ export default function MessageBubble({ message }) {
     const getDisplayContent = () => {
         const content = message.content || ''
         if (content.includes('tokens_limit_reached') || content.includes('413')) {
-            return "**Message Limit Reached (Free Tier)**\n\nConversation history exceeds the 8k token limit.\n\n**Solution:** Please start a new chat."
+            return "**Message Limit Reached (Free Tier)**\n\nConversation history exceeds the 8k token limit.\n\n**Solution:** Please start a new chat or try to reduce your input sentence."
         }
         if (isUser) {
             return content.replace(/^\[Mode: .*?\]\s*/, '')
