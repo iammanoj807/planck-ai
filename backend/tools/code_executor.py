@@ -127,11 +127,11 @@ def _execute_typescript(code: str, result: Dict[str, Any]) -> str:
     with tempfile.NamedTemporaryFile(suffix=".ts", mode="w+", delete=True) as temp:
         temp.write(code)
         temp.flush()
-        # npx ts-node, assumes installed
-        stdout, stderr, rc = _run_subprocess(["npx", "ts-node", temp.name])
+        # Use 'tsx' (modern ts-node alternative) via npx with -y to avoid interactive prompts
+        stdout, stderr, rc = _run_subprocess(["npx", "-y", "tsx", temp.name])
         result["stdout"], result["stderr"] = stdout, stderr
         result["success"] = rc == 0
-        if rc != 0: result["error"] = "Execution failed (ensure ts-node is installed)"
+        if rc != 0: result["error"] = "Execution failed (ensure node/npm is installed)"
     return json.dumps(result, indent=2)
 
 

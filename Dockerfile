@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y \
     golang-go \
     && rm -rf /var/lib/apt/lists/*
 # Install TypeScript runner (globally available for code_executor)
-RUN npm install -g ts-node typescript
+RUN npm install -g ts-node typescript tsx
 
 # Install Python Dependencies
 COPY backend/requirements.txt .
