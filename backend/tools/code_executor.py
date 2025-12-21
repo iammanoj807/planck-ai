@@ -123,17 +123,15 @@ def _execute_javascript(code: str, result: Dict[str, Any]) -> str:
     return json.dumps(result, indent=2)
 
 
-
 def _execute_typescript(code: str, result: Dict[str, Any]) -> str:
     with tempfile.NamedTemporaryFile(suffix=".ts", mode="w+", delete=True) as temp:
         temp.write(code)
         temp.flush()
-        # Use tsx (modern TS executor) via npx to handle ESM/CJS seamlessly
-        # -y ensures we don't prompt for installation
-        stdout, stderr, rc = _run_subprocess(["npx", "-y", "tsx", temp.name])
+        # npx ts-node, assumes installed
+        stdout, stderr, rc = _run_subprocess(["npx", "ts-node", temp.name])
         result["stdout"], result["stderr"] = stdout, stderr
         result["success"] = rc == 0
-        if rc != 0: result["error"] = "Execution failed (ensure node/npx is installed)"
+        if rc != 0: result["error"] = "Execution failed (ensure ts-node is installed)"
     return json.dumps(result, indent=2)
 
 

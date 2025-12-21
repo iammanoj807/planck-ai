@@ -28,9 +28,8 @@ RUN apt-get update && apt-get install -y \
     npm \
     golang-go \
     && rm -rf /var/lib/apt/lists/*
-# Install TypeScript runner
-# We use 'tsx' for better ESM compatibility
-RUN npm install -g tsx typescript
+# Install TypeScript runner (globally available for code_executor)
+RUN npm install -g ts-node typescript
 
 # Install Python Dependencies
 COPY backend/requirements.txt .

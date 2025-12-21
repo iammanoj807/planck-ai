@@ -201,6 +201,8 @@ class AgentRunner:
         # Append Language Instruction
         if language and language != "English":
             formatted_system_prompt += f"\n\nIMPORTANT: You must respond in {language}. Translate your internal reasoning if necessary, but the final output must be in {language}."
+            print(f"DEBUG: Injected Language Instruction for '{language}'")
+        
         messages = [{"role": "system", "content": formatted_system_prompt}]
         
         # Smart Context Management
@@ -266,6 +268,10 @@ class AgentRunner:
         if file_context:
             full_message = f"{file_context}\n\n{user_message}"
             
+        # Reinforce language instruction in the user message itself (for stronger adherence)
+        if language and language != "English":
+            full_message += f"\n\n(IMPORTANT: Please provide your final response in {language}. Ignore the language of search results.)"
+
         messages.append({"role": "user", "content": full_message})
         
         # Yield thinking start

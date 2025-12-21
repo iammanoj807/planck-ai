@@ -116,6 +116,10 @@ async def chat(request: ChatRequest):
         elif "[Mode: Web]" in request.message:
             mode = "web"
             clean_message = request.message.replace("[Mode: Web]", "").strip()
+        elif "[Focus Mode: Chat Only]" in request.message:
+            mode = "chat"
+            import re
+            clean_message = re.sub(r'\[Focus Mode:.*?\]', '', request.message).strip()
         
         # Detect and extract language preference
         # Format: [Language: Nepali]
@@ -125,12 +129,9 @@ async def chat(request: ChatRequest):
         if lang_match:
             language = lang_match.group(1)
             clean_message = clean_message.replace(lang_match.group(0), "").strip()
+            print(f"DEBUG: Extracted Language: '{language}' from message")
         
-        # Also handle legacy format just in case
-        elif "[Focus Mode: Chat Only]" in request.message:
-            mode = "chat"
-            # Strip the heavy-handed legacy tag
-            clean_message = re.sub(r'\[Focus Mode:.*?\]', '', request.message).strip()
+        print(f"DEBUG: Final Language for Agent: '{language}'")
 
         async for chunk in agent_runner.run(
             user_message=clean_message,

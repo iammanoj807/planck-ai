@@ -1,4 +1,3 @@
-import { useState, useRef, useEffect } from 'react'
 import { Menu, Sparkles } from 'lucide-react'
 
 const LANGUAGES = [
@@ -25,29 +24,7 @@ const LANGUAGES = [
 ]
 
 export default function Header({ onToggleSidebar, onNewChat, currentLanguage = 'English', onLanguageChange }) {
-    const [isLangMenuOpen, setIsLangMenuOpen] = useState(false)
-    const langMenuRef = useRef(null)
     const currentLangObj = LANGUAGES.find(l => l.code === currentLanguage) || LANGUAGES[0]
-
-    // Close on click outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (langMenuRef.current && !langMenuRef.current.contains(event.target)) {
-                setIsLangMenuOpen(false)
-            }
-        }
-        if (isLangMenuOpen) {
-            document.addEventListener('mousedown', handleClickOutside)
-        }
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside)
-        }
-    }, [isLangMenuOpen])
-
-    const handleLanguageSelect = (code) => {
-        onLanguageChange(code)
-        setIsLangMenuOpen(false)
-    }
 
     return (
         <header className="bg-pplx-dark px-4 py-3 flex items-center justify-between sticky top-0 z-50">
@@ -73,11 +50,8 @@ export default function Header({ onToggleSidebar, onNewChat, currentLanguage = '
 
             {/* Right section - Language Selector */}
             <div className="flex items-center gap-2">
-                <div className="relative" ref={langMenuRef}>
-                    <button
-                        onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-pplx-card hover:bg-white/10 transition-colors border ${isLangMenuOpen ? 'border-pplx-accent ring-1 ring-pplx-accent/50' : 'border-white/5'}`}
-                    >
+                <div className="relative group">
+                    <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-pplx-card hover:bg-white/10 transition-colors border border-white/5">
                         <span className="text-xl">
                             {currentLangObj.flag}
                         </span>
@@ -86,35 +60,28 @@ export default function Header({ onToggleSidebar, onNewChat, currentLanguage = '
                         </span>
                     </button>
 
-                    {/* Dropdown */}
-                    {isLangMenuOpen && (
-                        <div className="absolute right-0 top-full pt-2 w-72 z-50 animate-fade-in">
-                            <div className="bg-black border border-white/10 rounded-xl shadow-xl overflow-hidden">
-                                {/* Info Text */}
-                                <div className="px-4 py-2 border-b border-white/5 bg-white/5 text-xs text-pplx-muted whitespace-nowrap">
-                                    Language changes apply to new messages.
-                                </div>
-
-                                <div className="max-h-80 overflow-y-auto py-1 custom-scrollbar">
-                                    {LANGUAGES.map((lang) => (
-                                        <button
-                                            key={lang.code}
-                                            onClick={() => handleLanguageSelect(lang.code)}
-                                            className={`w-full text-left px-4 py-2.5 text-sm hover:bg-white/5 flex items-center justify-between group/item ${currentLanguage === lang.code ? 'bg-white/5' : ''}`}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-lg">{lang.flag}</span>
-                                                <span className={`font-medium ${currentLanguage === lang.code ? 'text-pplx-accent' : 'text-pplx-text group-hover/item:text-gray-200'}`}>
-                                                    {lang.label}
-                                                </span>
-                                            </div>
-                                            {currentLanguage === lang.code && <Sparkles className="w-3 h-3 text-pplx-accent" />}
-                                        </button>
-                                    ))}
-                                </div>
+                    {/* Dropdown - Using pt-2 instead of mt-2 to maintain hover bridge */}
+                    <div className="absolute right-0 top-full pt-2 w-56 hidden group-hover:block transition-all z-50">
+                        <div className="bg-pplx-card border border-white/10 rounded-xl shadow-xl overflow-hidden">
+                            <div className="max-h-80 overflow-y-auto py-1 custom-scrollbar">
+                                {LANGUAGES.map((lang) => (
+                                    <button
+                                        key={lang.code}
+                                        onClick={() => onLanguageChange(lang.code)}
+                                        className={`w-full text-left px-4 py-2.5 text-sm hover:bg-white/5 flex items-center justify-between group/item ${currentLanguage === lang.code ? 'bg-white/5' : ''}`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-lg">{lang.flag}</span>
+                                            <span className={`font-medium ${currentLanguage === lang.code ? 'text-pplx-accent' : 'text-pplx-text group-hover/item:text-gray-200'}`}>
+                                                {lang.label}
+                                            </span>
+                                        </div>
+                                        {currentLanguage === lang.code && <Sparkles className="w-3 h-3 text-pplx-accent" />}
+                                    </button>
+                                ))}
                             </div>
                         </div>
-                    )}
+                    </div>
                 </div>
             </div>
 
