@@ -147,13 +147,33 @@ async def chat(request: ChatRequest):
                 if not any(t.get("tool") == "thinking" for t in tool_calls):
                     tool_calls.append(tool_data)
             elif chunk["type"] == "tool_call":
-                # Include status and tool name for frontend ReasoningPanel compatibility
+                # Create entry for new tool call
                 tool_data = {
                     "tool": chunk["metadata"].get("tool"),
                     "input": chunk["metadata"].get("input"),
-                    "status": "complete"  # All saved tools are complete
+                    "status": "running" # Mark as running initially
                 }
                 tool_calls.append(tool_data)
+                
+            elif chunk["type"] == "tool_result":
+                # Update the last tool call with the result
+                if tool_calls:
+                    last_tool = tool_calls[-1]
+                    # Verify it matches the tool name to be safe
+                    if last_tool.get("tool") == chunk["metadata"].get("tool"):
+                        result = chunk["metadata"].get("full_result")
+                        
+                        # Attempt to parse code executor results which are JSON strings
+                        if last_tool.get("tool") == "code_executor" and isinstance(result, str):
+                            try:
+                                parsed_result = json.loads(result)
+                                result = parsed_result
+                            except:
+                                pass
+                                
+                        last_tool["result"] = result
+                        last_tool["status"] = "complete"
+
             elif chunk["type"] == "error":
                 # Signal frontend that processing is complete
                 # Also save the error to memory so it doesn't disappear on reload
