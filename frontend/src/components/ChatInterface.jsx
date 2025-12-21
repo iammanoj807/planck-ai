@@ -344,7 +344,7 @@ export default function ChatInterface({
                         {renderInputArea(true)}
                     </HeroSection>
                 ) : (
-                    <div className="p-4 lg:p-6 pb-48 lg:pb-24 space-y-6 max-w-4xl mx-auto w-full">
+                    <div className="p-4 lg:p-6 pb-64 lg:pb-48 space-y-6 max-w-4xl mx-auto w-full">
                         {messages.map((message) => (
                             <MessageBubble key={message.id} message={message} />
                         ))}
@@ -361,7 +361,7 @@ export default function ChatInterface({
                             />
                         )}
 
-                        <div ref={messagesEndRef} className="h-64" />
+                        <div ref={messagesEndRef} className="h-4" />
                     </div>
                 )}
             </div>
