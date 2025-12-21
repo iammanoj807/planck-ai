@@ -58,12 +58,15 @@ export default function Sidebar({
       `}
         >
             {/* Logo Area (Desktop) */}
-            <div className="p-4 pl-6 hidden lg:block">
-                <div className="flex items-center gap-2">
+            <div className="p-4 pl-6 pt-8 hidden lg:block">
+                <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-pplx-accent flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity" title="Planck AI">
                         <Sparkles className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-xl font-serif font-medium text-pplx-text tracking-wide flex items-center gap-1">Planck <span className="text-pplx-accent">AI</span></span>
+                    <div>
+                        <span className="text-xl font-serif font-medium text-pplx-text tracking-wide flex items-center gap-1">Planck <span className="text-pplx-accent">AI</span></span>
+                        <p className="text-xs text-pplx-muted font-medium tracking-wide mt-0.5">Autonomous Reasoning Engine</p>
+                    </div>
                 </div>
             </div>
 
@@ -81,7 +84,7 @@ export default function Sidebar({
             {/* Conversations List */}
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {conversations.length === 0 ? (
-                    <div className="text-center py-8 text-pplx-muted">
+                    <div className="h-full flex flex-col items-center justify-center text-center text-pplx-muted pb-8">
                         <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-50" />
                         <p className="text-sm">No conversations yet</p>
                         <p className="text-xs mt-1">Start chatting to create one</p>

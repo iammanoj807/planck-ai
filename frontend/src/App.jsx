@@ -108,29 +108,30 @@ function App() {
     }, [])
 
     return (
-        <div className="h-screen overflow-hidden flex flex-col bg-pplx-dark">
-            {/* Header */}
-            <Header
-                onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        <div className="h-screen overflow-hidden flex bg-pplx-dark">
+            {/* Sidebar - Now a sibling of the main content column */}
+            <Sidebar
+                isOpen={sidebarOpen}
+                conversations={conversations}
+                activeConversation={activeConversation}
+                onSelectConversation={handleSelectConversation}
                 onNewChat={handleNewChat}
-                currentLanguage={language}
-                onLanguageChange={setLanguage}
+                onDeleteConversation={handleDeleteConversation}
+                selectedModel={selectedModel}
+                onSelectModel={setSelectedModel}
             />
 
-            {/* Main content */}
-            <div className="flex-1 flex overflow-hidden">
-                <Sidebar
-                    isOpen={sidebarOpen}
-                    conversations={conversations}
-                    activeConversation={activeConversation}
-                    onSelectConversation={handleSelectConversation}
+            {/* Main Content Column */}
+            <div className="flex-1 flex flex-col min-w-0 h-full relative text-white">
+                {/* Header */}
+                <Header
+                    onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
                     onNewChat={handleNewChat}
-                    onDeleteConversation={handleDeleteConversation}
-                    selectedModel={selectedModel}
-                    onSelectModel={setSelectedModel}
+                    currentLanguage={language}
+                    onLanguageChange={setLanguage}
                 />
 
-                {/* Sidebar Toggle Button (Desktop) */}
+                {/* Sidebar Toggle Button (Desktop) - Moves with the sidebar edge */}
                 <button
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                     className={`
@@ -141,8 +142,9 @@ function App() {
                         rounded-r-lg
                         text-pplx-muted hover:text-pplx-accent
                         transition-all duration-300 ease-in-out
-                        ${sidebarOpen ? 'left-96' : 'left-0 border-l'}
+                        left-0
                     `}
+                    style={{ left: sidebarOpen ? '-1px' : '0' }} // Adjust based on visual preference or remove if Sidebar handles space
                     aria-label="Toggle Sidebar"
                 >
                     {sidebarOpen ? (
@@ -153,7 +155,7 @@ function App() {
                 </button>
 
                 {/* Chat area */}
-                <main className={`flex-1 min-w-0 w-full transition-all duration-300 ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
+                <main className="flex-1 min-w-0 w-full">
                     <ChatInterface
                         conversationId={activeConversation}
                         messages={messages}
