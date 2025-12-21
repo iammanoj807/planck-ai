@@ -123,6 +123,8 @@ def _execute_javascript(code: str, result: Dict[str, Any]) -> str:
     return json.dumps(result, indent=2)
 
 
+
+def _execute_typescript(code: str, result: Dict[str, Any]) -> str:
     with tempfile.NamedTemporaryFile(suffix=".ts", mode="w+", delete=True) as temp:
         temp.write(code)
         temp.flush()
