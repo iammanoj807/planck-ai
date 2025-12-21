@@ -98,40 +98,41 @@ async def chat(request: ChatRequest):
         for msg in history
     ]
     
-    # Add user message to memory
-    memory.add_message(conversation_id, "user", request.message)
+    # --- PARSING LOGIC MOVED UP ---
+    mode = "web"
+    clean_message = request.message
+    language = "English"
+
+    # Detect mode
+    if "[Mode: Chat]" in request.message:
+        mode = "chat"
+        clean_message = request.message.replace("[Mode: Chat]", "").strip()
+    elif "[Mode: Web]" in request.message:
+        mode = "web"
+        clean_message = request.message.replace("[Mode: Web]", "").strip()
+
+    # Detect Language
+    import re
+    lang_match = re.search(r'\[Language: (.*?)\]', clean_message)
+    if lang_match:
+        language = lang_match.group(1)
+        clean_message = clean_message.replace(lang_match.group(0), "").strip()
+    
+    # Handle legacy format
+    elif "[Focus Mode: Chat Only]" in request.message:
+        mode = "chat"
+        clean_message = re.sub(r'\[Focus Mode:.*?\]', '', request.message).strip()
+    
+    # --- SAVE CLEAN MESSAGE ---
+    memory.add_message(conversation_id, "user", clean_message)
     
     async def generate():
         """Generate streaming response."""
         full_response = ""
         tool_calls = []
         
-        # Detect mode from message content (injected by frontend)
-        mode = "web"
-        clean_message = request.message
-
-        if "[Mode: Chat]" in request.message:
-            mode = "chat"
-            clean_message = request.message.replace("[Mode: Chat]", "").strip()
-        elif "[Mode: Web]" in request.message:
-            mode = "web"
-            clean_message = request.message.replace("[Mode: Web]", "").strip()
+        # Use captured variables from outer scope: mode, clean_message, language
         
-        # Detect and extract language preference
-        # Format: [Language: Nepali]
-        language = "English"
-        import re
-        lang_match = re.search(r'\[Language: (.*?)\]', clean_message)
-        if lang_match:
-            language = lang_match.group(1)
-            clean_message = clean_message.replace(lang_match.group(0), "").strip()
-        
-        # Also handle legacy format just in case
-        elif "[Focus Mode: Chat Only]" in request.message:
-            mode = "chat"
-            # Strip the heavy-handed legacy tag
-            clean_message = re.sub(r'\[Focus Mode:.*?\]', '', request.message).strip()
-
         async for chunk in agent_runner.run(
             user_message=clean_message,
             conversation_history=conversation_history,
