@@ -61,8 +61,13 @@ export default function Header({ onToggleSidebar, onNewChat, currentLanguage = '
                     </button>
 
                     {/* Dropdown - Using pt-2 instead of mt-2 to maintain hover bridge */}
-                    <div className="absolute right-0 top-full pt-2 w-56 hidden group-hover:block transition-all z-50">
-                        <div className="bg-pplx-card border border-white/10 rounded-xl shadow-xl overflow-hidden">
+                    <div className="absolute right-0 top-full pt-2 w-64 hidden group-hover:block transition-all z-50">
+                        <div className="bg-zinc-950 border border-white/10 rounded-xl shadow-xl overflow-hidden">
+                            <div className="px-4 py-3 border-b border-white/10 bg-zinc-900/50">
+                                <p className="text-[10px] text-gray-400 leading-tight">
+                                    Language changes apply to new messages.
+                                </p>
+                            </div>
                             <div className="max-h-80 overflow-y-auto py-1 custom-scrollbar">
                                 {LANGUAGES.map((lang) => (
                                     <button
