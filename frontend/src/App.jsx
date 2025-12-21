@@ -155,7 +155,7 @@ function App() {
                 </button>
 
                 {/* Chat area */}
-                <main className="flex-1 min-w-0 w-full">
+                <main className="flex-1 min-w-0 w-full overflow-hidden">
                     <ChatInterface
                         conversationId={activeConversation}
                         messages={messages}
