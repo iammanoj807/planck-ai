@@ -24,7 +24,8 @@ export default function ChatInterface({
     messages,
     onAddMessage,
     onConversationUpdate,
-    selectedModel // New prop: 'gpt-4o' | 'gpt-4o-mini'
+    selectedModel, // New prop: 'gpt-4o' | 'gpt-4o-mini'
+    currentLanguage = 'English'
 }) {
     const [input, setInput] = useState('')
     const [isLoading, setIsLoading] = useState(false)
@@ -119,6 +120,11 @@ export default function ChatInterface({
             finalMessage = `[Mode: Chat] ${trimmedInput}`
         } else if (focusMode === 'web') {
             finalMessage = `[Mode: Web] ${trimmedInput}`
+        }
+
+        // Append Language instructions (hidden)
+        if (currentLanguage && currentLanguage !== 'English') {
+            finalMessage += ` [Language: ${currentLanguage}]`
         }
 
         const userMessage = {

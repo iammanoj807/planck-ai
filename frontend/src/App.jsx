@@ -20,6 +20,7 @@ function App() {
     // Sidebar defaults to open on large screens, closed on mobile
     const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1024)
     const [selectedModel, setSelectedModel] = useState('gpt-4o-mini')
+    const [language, setLanguage] = useState('English')
 
     // Handle resize to auto-close/open
     useEffect(() => {
@@ -112,6 +113,8 @@ function App() {
             <Header
                 onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
                 onNewChat={handleNewChat}
+                currentLanguage={language}
+                onLanguageChange={setLanguage}
             />
 
             {/* Main content */}
@@ -157,6 +160,7 @@ function App() {
                         onAddMessage={handleAddMessage}
                         onConversationUpdate={handleConversationUpdate}
                         selectedModel={selectedModel}
+                        currentLanguage={language}
                     />
                 </main>
             </div>

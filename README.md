@@ -21,6 +21,7 @@ Planck AI is an advanced agentic search interface that combines the reasoning po
 - **💻 Code Execution**: Writes and runs code in **7+ Languages** (Python, Java, JS/TS, C/C++, Go) to solve logic/math problems.
 - **🌐 Deep Web Search**: Integated with Google & DuckDuckGo to find real-time information.
 - **📄 Document Analysis**: Upload PDFs or paste URLs—Planck reads and analyzes them (up to 10k chars/page).
+- **🗣️ Multi-Language Support**: Fluent in **20+ languages** (English, Nepali, Hindi, Mandarin, etc.) for both interaction and reasoning.
 - **👁️ Vision Capabilities**: Analyze uploaded images using GPT-4o's vision model.
 - **⚡ Reactive UI**: A beautiful, dark-mode interface built with React & TailwindCSS.
 - **🔒 Privacy First**: All sessions are isolated. No data is stored permanently.

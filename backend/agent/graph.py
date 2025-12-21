@@ -163,7 +163,8 @@ class AgentRunner:
         conversation_history: list = None,
         files: list = None,
         model_name: str = "gpt-4o-mini",
-        mode: str = "web"
+        mode: str = "web",
+        language: str = "English"
     ) -> AsyncGenerator[StreamingChunk, None]:
         """
         Run the agent loop (Thinking -> Tool Use -> Final Response).
@@ -196,6 +197,10 @@ class AgentRunner:
         formatted_system_prompt = system_prompt.format(
             current_date=datetime.now().strftime("%A, %B %d, %Y")
         )
+        
+        # Append Language Instruction
+        if language and language != "English":
+            formatted_system_prompt += f"\n\nIMPORTANT: You must respond in {language}. Translate your internal reasoning if necessary, but the final output must be in {language}."
         messages = [{"role": "system", "content": formatted_system_prompt}]
         
         # Smart Context Management
