@@ -18,8 +18,9 @@ Planck AI is an advanced agentic search interface that combines the reasoning po
 ## 🚀 Features
 
 - **🧠 Agentic Reasoning**: Uses a multi-step "Thinking" process to plan, execute, and verify tasks.
-- **💻 Code Execution**: Writes and runs code in **7+ Languages** (Python, Java, JS/TS, C/C++, Go) to solve logic/math problems.
 - **🌐 Deep Web Search**: Integated with Google & DuckDuckGo to find real-time information.
+- **🌍 Multi-Language Support**: Talk to Planck in **20+ Languages** (e.g., Nepali, Spanish, Hindi, French). The UI adapts, and the agent responds natively while maintaining its reasoning capabilities.
+- **💻 Code Execution**: Writes and runs code in **7+ Languages** (Python, Java, JS/TS, C/C++, Go) to solve logic/math problems.
 - **📄 Document Analysis**: Upload PDFs or paste URLs—Planck reads and analyzes them (up to 10k chars/page).
 - **️ Vision Capabilities**: Analyze uploaded images using GPT-4o's vision model.
 - **⚡ Reactive UI**: A beautiful, dark-mode interface built with React & TailwindCSS.
