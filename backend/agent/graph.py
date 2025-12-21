@@ -201,14 +201,6 @@ class AgentRunner:
         # Append Language Instruction
         if language and language != "English":
             formatted_system_prompt += f"\n\nIMPORTANT: You must respond in {language}. Translate your internal reasoning if necessary, but the final output must be in {language}."
-        
-        # Override History Bias:
-        # If the conversation history has a different language, the model might get confused.
-        # We explicitly append the instruction to the *current* user message to force the switch.
-        current_user_content = user_message
-        if language and language != "English":
-            current_user_content += f"\n\n(Please answer in {language})"
-
         messages = [{"role": "system", "content": formatted_system_prompt}]
         
         # Smart Context Management
@@ -216,36 +208,49 @@ class AgentRunner:
         # Github Models Free Tier has a strict 8k token limit for ALL models
         # 8k tokens ~= 32k chars. We use 30k to be safe.
         MAX_HISTORY_CHARS = 30000
+            
+        current_chars = 0
+        selected_history = []
         
         if conversation_history:
-            # Sort by timestamp just in case
-            sorted_history = sorted(conversation_history, key=lambda x: x.get("timestamp", ""))
-            
-            # Simple truncation strategy
-            truncated_history = []
-            current_chars = 0
-            
-            # Add history from newest to oldest until limit
-            for msg in reversed(sorted_history):
-                content_len = len(msg.get("documents", [""])[0] if isinstance(msg.get("documents"), list) else str(msg.get("content", "")))
-                if current_chars + content_len > MAX_HISTORY_CHARS:
-                    break
-                truncated_history.insert(0, msg)
-                current_chars += content_len
-            
-            # Convert to OpenAI format
-            for msg in truncated_history:
-                # Handle stored document format vs raw content
-                content = msg.get("documents", [""])[0] if isinstance(msg.get("documents"), list) else msg.get("content", "")
+            # Iterate backwards to keep most recent first
+            for msg in reversed(conversation_history):
+                content = msg.get("content") or ""
                 
-                # Skip system messages in history if any
-                if msg.get("role") == "system":
-                    continue
-                    
-                messages.append({
-                    "role": msg.get("role"),
+                # Truncate extremely long individual text messages
+                if content and len(content) > 2000:
+                    content = content[:2000] + "... [truncated]"
+                
+                # Estimate size (including tool call overhead)
+                msg_len = len(content) + 200 # Buffer for metadata
+                
+                if current_chars + msg_len > MAX_HISTORY_CHARS:
+                    # Soft limit hit - stop adding history
+                    break
+                
+                # Reconstruct message preserving CRITICAL fields for API validity
+                clean_msg = {
+                    "role": msg["role"],
                     "content": content
-                })
+                }
+                if "tool_calls" in msg:
+                    clean_msg["tool_calls"] = msg["tool_calls"]
+                if "tool_call_id" in msg:
+                    clean_msg["tool_call_id"] = msg["tool_call_id"]
+                if "name" in msg:
+                    clean_msg["name"] = msg["name"]
+
+                selected_history.insert(0, clean_msg)
+                current_chars += msg_len
+
+        # SAFETY: Ensure history doesn't start with a 'tool' result (orphan)
+        # API requires: User/System -> Assistant -> Tool -> Assistant ...
+        # If we cut in the middle, we might start with 'tool'.
+        while selected_history and selected_history[0].get("role") == "tool":
+            selected_history.pop(0)
+
+        # Add trimmed history to messages
+        messages.extend(selected_history)
                 
         # Add file context if any
         file_context = ""

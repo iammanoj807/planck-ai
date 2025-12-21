@@ -66,7 +66,7 @@ def code_executor_tool(code: str, language: str = "python") -> str:
 
 
 def _execute_python(code: str, result: Dict[str, Any]) -> str:
-    """Executes Python code in-process using AST to capture last expression."""
+    """Executes Python code in-process using exec()."""
     stdout_capture = io.StringIO()
     stderr_capture = io.StringIO()
     
@@ -83,39 +83,13 @@ def _execute_python(code: str, result: Dict[str, Any]) -> str:
     exec_globals = {'__builtins__': safe_builtins}
     exec_locals = {}
     
-    import ast
-
     try:
         with redirect_stdout(stdout_capture), redirect_stderr(stderr_capture):
-            # Parse the code into an AST
             try:
-                tree = ast.parse(code)
-            except SyntaxError:
-                # If parsing fails, fall back to simple exec to let it raise the error naturally
-                exec(code, exec_globals, exec_locals)
-                
-            # Check if likely an expression at the end
-            last_node = None
-            if tree.body and isinstance(tree.body[-1], ast.Expr):
-                last_node = tree.body.pop()
-            
-            # Execute the main block (all statements except the last expression)
-            if tree.body:
-                # Compile as a module
-                module = ast.Module(body=tree.body, type_ignores=[])
-                # We must fix locations for the new AST to be compilable
-                ast.fix_missing_locations(module)
-                compiled_module = compile(module, filename="<string>", mode="exec")
-                exec(compiled_module, exec_globals, exec_locals)
-            
-            # Evaluate the last expression (if any)
-            if last_node:
-                expr = ast.Expression(body=last_node.value)
-                ast.fix_missing_locations(expr)
-                compiled_expr = compile(expr, filename="<string>", mode="eval")
-                exec_result = eval(compiled_expr, exec_globals, exec_locals)
-                # Store the result
+                exec_result = eval(code, exec_globals, exec_locals)
                 result["result"] = str(exec_result) if exec_result is not None else None
+            except SyntaxError:
+                exec(code, exec_globals, exec_locals)
                 
         result["stdout"] = stdout_capture.getvalue()
         result["stderr"] = stderr_capture.getvalue()
