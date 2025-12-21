@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import { Menu, Sparkles } from 'lucide-react'
+
+// ... LANGUAGES array remains same ...
 
 const LANGUAGES = [
     { code: 'English', flag: '🇺🇸', label: 'English' },
@@ -24,6 +27,7 @@ const LANGUAGES = [
 ]
 
 export default function Header({ onToggleSidebar, onNewChat, currentLanguage = 'English', onLanguageChange }) {
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const currentLangObj = LANGUAGES.find(l => l.code === currentLanguage) || LANGUAGES[0]
 
     return (
@@ -50,7 +54,11 @@ export default function Header({ onToggleSidebar, onNewChat, currentLanguage = '
 
             {/* Right section - Language Selector */}
             <div className="flex items-center gap-2">
-                <div className="relative group">
+                <div
+                    className="relative"
+                    onMouseEnter={() => setIsDropdownOpen(true)}
+                    onMouseLeave={() => setIsDropdownOpen(false)}
+                >
                     <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-pplx-card hover:bg-white/10 transition-colors border border-white/5">
                         <span className="text-xl">
                             {currentLangObj.flag}
@@ -60,33 +68,38 @@ export default function Header({ onToggleSidebar, onNewChat, currentLanguage = '
                         </span>
                     </button>
 
-                    {/* Dropdown - Using pt-2 instead of mt-2 to maintain hover bridge */}
-                    <div className="absolute right-0 top-full pt-2 w-64 hidden group-hover:block transition-all z-50">
-                        <div className="bg-zinc-950 border border-white/10 rounded-xl shadow-xl overflow-hidden">
-                            <div className="px-4 py-3 border-b border-white/10 bg-zinc-900/50">
-                                <p className="text-[10px] text-gray-400 leading-tight">
-                                    Language changes apply to new messages.
-                                </p>
-                            </div>
-                            <div className="max-h-80 overflow-y-auto py-1 custom-scrollbar">
-                                {LANGUAGES.map((lang) => (
-                                    <button
-                                        key={lang.code}
-                                        onClick={() => onLanguageChange(lang.code)}
-                                        className={`w-full text-left px-4 py-2.5 text-sm hover:bg-white/5 flex items-center justify-between group/item ${currentLanguage === lang.code ? 'bg-white/5' : ''}`}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-lg">{lang.flag}</span>
-                                            <span className={`font-medium ${currentLanguage === lang.code ? 'text-pplx-accent' : 'text-pplx-text group-hover/item:text-gray-200'}`}>
-                                                {lang.label}
-                                            </span>
-                                        </div>
-                                        {currentLanguage === lang.code && <Sparkles className="w-3 h-3 text-pplx-accent" />}
-                                    </button>
-                                ))}
+                    {/* Dropdown - Controlled by State */}
+                    {isDropdownOpen && (
+                        <div className="absolute right-0 top-full pt-2 w-64 transition-all z-50 animate-fade-in">
+                            <div className="bg-zinc-950 border border-white/10 rounded-xl shadow-xl overflow-hidden">
+                                <div className="px-4 py-3 border-b border-white/10 bg-zinc-900/50">
+                                    <p className="text-[10px] text-gray-400 leading-tight">
+                                        Language changes apply to new messages.
+                                    </p>
+                                </div>
+                                <div className="max-h-80 overflow-y-auto py-1 custom-scrollbar">
+                                    {LANGUAGES.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            onClick={() => {
+                                                onLanguageChange(lang.code)
+                                                setIsDropdownOpen(false)
+                                            }}
+                                            className={`w-full text-left px-4 py-2.5 text-sm hover:bg-white/5 flex items-center justify-between group/item ${currentLanguage === lang.code ? 'bg-white/5' : ''}`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-lg">{lang.flag}</span>
+                                                <span className={`font-medium ${currentLanguage === lang.code ? 'text-pplx-accent' : 'text-pplx-text group-hover/item:text-gray-200'}`}>
+                                                    {lang.label}
+                                                </span>
+                                            </div>
+                                            {currentLanguage === lang.code && <Sparkles className="w-3 h-3 text-pplx-accent" />}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 
