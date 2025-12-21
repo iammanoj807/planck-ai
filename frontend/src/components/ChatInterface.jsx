@@ -362,12 +362,14 @@ export default function ChatInterface({
 
             {/* Scroll to Bottom Button */}
             {showScrollButton && (
-                <button
-                    onClick={scrollToBottom}
-                    className="absolute bottom-48 left-1/2 -translate-x-1/2 bg-pplx-card border border-white/10 p-2 rounded-full shadow-lg hover:bg-white/10 transition-all animate-fade-in z-20"
-                >
-                    <ArrowDown className="w-5 h-5 text-slate-300" />
-                </button>
+                <div className="absolute bottom-48 left-1/2 -translate-x-1/2 z-20">
+                    <button
+                        onClick={scrollToBottom}
+                        className="bg-pplx-card border border-white/10 p-2 rounded-full shadow-lg hover:bg-white/10 transition-all animate-fade-in"
+                    >
+                        <ArrowDown className="w-5 h-5 text-slate-300" />
+                    </button>
+                </div>
             )}
 
             {/* Fixed input area (only shows when messages exist) */}

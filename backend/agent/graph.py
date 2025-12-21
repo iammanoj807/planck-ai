@@ -18,7 +18,8 @@ from tools.thinking import thinking_tool, THINKING_TOOL_DEF
 
 
 # Tool definitions for the model
-# Tool definitions for the model
+
+# Tools allowed in Web Search Mode
 TOOLS = [
     THINKING_TOOL_DEF,
     WEB_SEARCH_TOOL_DEF,
