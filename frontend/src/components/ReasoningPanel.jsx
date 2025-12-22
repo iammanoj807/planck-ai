@@ -60,7 +60,7 @@ export default function ReasoningPanel({ toolCalls, model, language }) {
                                 <BrainCircuit className="w-4 h-4 text-pplx-accent" />
                             )}
                         </div>
-                        <span className="text-sm font-medium text-slate-300 group-hover:text-pplx-accent transition-colors">
+                        <span className="text-sm font-medium text-pplx-accent transition-colors">
                             {isRunning
                                 ? 'Thinking...'
                                 : `${safeToolCalls.length} step${safeToolCalls.length !== 1 ? 's' : ''}`
@@ -81,7 +81,7 @@ export default function ReasoningPanel({ toolCalls, model, language }) {
                         <span className={`text-[11px] font-medium tracking-wide ${model === 'gpt-4o' ? 'text-cyan-100' : 'text-zinc-400'}`}>
                             {model === 'gpt-4o' ? 'GPT-4o' : 'GPT-4o Mini'}
                             {language && (
-                                <span className={model === 'gpt-4o' ? 'text-cyan-100' : 'text-zinc-400'}>
+                                <span>
                                     <span className="mx-1.5 opacity-40">•</span>
                                     {languageFlag && <span className="mr-1">{languageFlag}</span>}
                                     {language}
