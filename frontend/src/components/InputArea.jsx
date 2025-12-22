@@ -110,7 +110,7 @@ export default function InputArea({
                                             const ModeIcon = mode.icon
                                             return <ModeIcon className="w-5 h-5 text-pplx-accent" />
                                         })()}
-                                        <span>{(FOCUS_MODES.find(m => m.id === focusMode) || FOCUS_MODES[0]).label}</span>
+                                        <span className="hidden sm:inline text-sm">{(FOCUS_MODES.find(m => m.id === focusMode) || FOCUS_MODES[0]).label}</span>
                                         <ChevronDown className="w-3 h-3 opacity-50" />
                                     </button>
 
@@ -120,7 +120,7 @@ export default function InputArea({
                                                 className="fixed inset-0 z-10"
                                                 onClick={() => setShowFocusMenu(false)}
                                             />
-                                            <div className={`absolute ${centered ? 'top-full mt-2' : 'bottom-full mb-2'} left-0 -ml-2 w-48 bg-black border border-zinc-800 rounded-xl shadow-xl z-30 overflow-hidden py-1 animate-fade-in`}>
+                                            <div className={`absolute ${centered ? 'top-full mt-2' : 'bottom-full mb-2'} left-0 -ml-2 w-max bg-black border border-zinc-800 rounded-xl shadow-xl z-30 overflow-hidden py-1 animate-fade-in`}>
                                                 {FOCUS_MODES.map((mode) => (
                                                     <button
                                                         key={mode.id}
@@ -199,7 +199,7 @@ export default function InputArea({
                                             className="fixed inset-0 z-10"
                                             onClick={() => setShowModelMenu(false)}
                                         />
-                                        <div className={`absolute ${centered ? 'top-full mt-2' : 'bottom-full mb-2'} left-0 w-64 bg-black border border-zinc-800 rounded-xl shadow-xl z-30 overflow-hidden py-1 animate-fade-in`}>
+                                        <div className={`absolute ${centered ? 'top-full mt-2' : 'bottom-full mb-2'} left-0 w-max bg-black border border-zinc-800 rounded-xl shadow-xl z-30 overflow-hidden py-1 animate-fade-in`}>
                                             {MODELS.map((model) => (
                                                 <button
                                                     key={model.id}
