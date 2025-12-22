@@ -120,7 +120,7 @@ export default function InputArea({
                                                 className="fixed inset-0 z-10"
                                                 onClick={() => setShowFocusMenu(false)}
                                             />
-                                            <div className="absolute top-full left-0 mt-2 -ml-2 w-48 bg-black border border-zinc-800 rounded-xl shadow-xl z-30 overflow-hidden py-1 animate-fade-in">
+                                            <div className={`absolute ${centered ? 'top-full mt-2' : 'bottom-full mb-2'} left-0 -ml-2 w-48 bg-black border border-zinc-800 rounded-xl shadow-xl z-30 overflow-hidden py-1 animate-fade-in`}>
                                                 {FOCUS_MODES.map((mode) => (
                                                     <button
                                                         key={mode.id}
@@ -160,14 +160,14 @@ export default function InputArea({
                                         >
                                             <mode.icon className={`w-5 h-5 ${focusMode === mode.id ? 'text-pplx-accent' : 'text-current'}`} />
 
-                                            {/* Hover Tooltip - Positioned Below */}
-                                            <div className="absolute top-full left-0 mt-2 w-max max-w-[250px] px-3 py-2 bg-zinc-950 border border-white/10 rounded-lg shadow-xl opacity-0 group-hover/mode:opacity-100 invisible group-hover/mode:visible transition-all duration-200 z-50 pointer-events-none transform translate-y-1 group-hover/mode:translate-y-0">
+                                            {/* Hover Tooltip */}
+                                            <div className={`absolute ${centered ? 'top-full mt-2' : 'bottom-full mb-2'} left-0 w-max max-w-[250px] px-3 py-2 bg-zinc-950 border border-white/10 rounded-lg shadow-xl opacity-0 group-hover/mode:opacity-100 invisible group-hover/mode:visible transition-all duration-200 z-50 pointer-events-none transform ${centered ? '-translate-y-1' : 'translate-y-1'} group-hover/mode:translate-y-0`}>
                                                 <div className="text-left">
                                                     <span className="font-semibold block mb-0.5 text-pplx-accent text-base">{mode.label}</span>
                                                     <span className="text-xs text-zinc-300 font-normal leading-normal block">{mode.description}</span>
                                                 </div>
                                                 {/* Arrow visual */}
-                                                <div className="absolute -top-1 left-4 w-2 h-2 bg-zinc-950 border-t border-l border-white/10 rotate-45"></div>
+                                                <div className={`absolute ${centered ? '-top-1 border-t' : '-bottom-1 border-b'} left-4 w-2 h-2 bg-zinc-950 border-l border-white/10 rotate-45`}></div>
                                             </div>
                                         </button>
                                     ))}
@@ -199,7 +199,7 @@ export default function InputArea({
                                             className="fixed inset-0 z-10"
                                             onClick={() => setShowModelMenu(false)}
                                         />
-                                        <div className="absolute top-full left-0 mt-2 w-48 bg-black border border-zinc-800 rounded-xl shadow-xl z-30 overflow-hidden py-1 animate-fade-in">
+                                        <div className={`absolute ${centered ? 'top-full mt-2' : 'bottom-full mb-2'} left-0 w-48 bg-black border border-zinc-800 rounded-xl shadow-xl z-30 overflow-hidden py-1 animate-fade-in`}>
                                             {MODELS.map((model) => (
                                                 <button
                                                     key={model.id}
