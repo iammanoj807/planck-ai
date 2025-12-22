@@ -376,7 +376,7 @@ export default function ChatInterface({
             </div>
 
             {/* Scroll to Bottom Button */}
-            {showScrollButton && (
+            {showScrollButton && messages.length > 0 && (
                 <div className="absolute bottom-48 left-1/2 -translate-x-1/2 z-20">
                     <button
                         onClick={scrollToBottom}
