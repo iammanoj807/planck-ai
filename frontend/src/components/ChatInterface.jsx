@@ -231,7 +231,8 @@ export default function ChatInterface({
                                         role: 'assistant',
                                         content: fullContent,
                                         toolCalls: accumulatedToolCalls,
-                                        model: selectedModel
+                                        model: selectedModel,
+                                        language: currentLanguage
                                     })
                                     return
                                 }
@@ -250,7 +251,8 @@ export default function ChatInterface({
                                         role: 'assistant',
                                         content: fullContent,
                                         toolCalls: accumulatedToolCalls,
-                                        model: selectedModel // Pass model info
+                                        model: selectedModel,
+                                        language: currentLanguage
                                     })
                                 }
                             }

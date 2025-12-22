@@ -17,7 +17,14 @@ const TOOL_LABELS = {
     thinking: 'Thinking...'
 }
 
-export default function ReasoningPanel({ toolCalls, model }) {
+const LANGUAGES_MAP = {
+    'English': '🇺🇸', 'Nepali': '🇳🇵', 'Hindi': '🇮🇳', 'Mandarin': '🇨🇳', 'Spanish': '🇪🇸',
+    'French': '🇫🇷', 'Arabic': '🇸🇦', 'Bengali': '🇧🇩', 'Russian': '🇷🇺', 'Portuguese': '🇵🇹',
+    'Indonesian': '🇮🇩', 'Urdu': '🇵🇰', 'German': '🇩🇪', 'Japanese': '🇯🇵', 'Swahili': '🇰🇪',
+    'Turkish': '🇹🇷', 'Korean': '🇰🇷', 'Vietnamese': '🇻🇳', 'Italian': '🇮🇹', 'Thai': '🇹🇭'
+}
+
+export default function ReasoningPanel({ toolCalls, model, language }) {
     const [isExpanded, setIsExpanded] = useState(false)
     const [expandedTools, setExpandedTools] = useState({})
 
@@ -34,6 +41,7 @@ export default function ReasoningPanel({ toolCalls, model }) {
     const safeToolCalls = toolCalls || []
     const runningCount = safeToolCalls.filter(t => t.status === 'running').length
     const isRunning = runningCount > 0
+    const languageFlag = language ? LANGUAGES_MAP[language] : ''
 
     return (
         <div className="my-2 animate-fade-in">
@@ -72,6 +80,13 @@ export default function ReasoningPanel({ toolCalls, model }) {
                         <Bot className="w-3.5 h-3.5 text-cyan-400" />
                         <span className={`text-[11px] font-medium tracking-wide ${model === 'gpt-4o' ? 'text-cyan-100' : 'text-zinc-400'}`}>
                             {model === 'gpt-4o' ? 'GPT-4o' : 'GPT-4o Mini'}
+                            {language && (
+                                <span className={model === 'gpt-4o' ? 'text-cyan-100' : 'text-zinc-400'}>
+                                    <span className="mx-1.5 opacity-40">•</span>
+                                    {languageFlag && <span className="mr-1">{languageFlag}</span>}
+                                    {language}
+                                </span>
+                            )}
                         </span>
                     </div>
                 )}

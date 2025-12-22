@@ -285,7 +285,7 @@ export default function MessageBubble({ message }) {
                             </ReactMarkdown>
                             {!isUser && (showBottomReasoning || message.model) && (
                                 <div className="mt-4 pt-3">
-                                    <ReasoningPanel toolCalls={toolCalls} model={message.model} timestamp={message.timestamp} />
+                                    <ReasoningPanel toolCalls={toolCalls} model={message.model} language={message.language} timestamp={message.timestamp} />
                                 </div>
                             )}
                         </div>

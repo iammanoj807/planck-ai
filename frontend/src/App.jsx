@@ -19,7 +19,7 @@ function App() {
     const [messages, setMessages] = useState([])
     // Sidebar defaults to open on large screens, closed on mobile
     const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1024)
-    const [selectedModel, setSelectedModel] = useState('gpt-4o-mini')
+    const [selectedModel, setSelectedModel] = useState('gpt-4o')
     const [language, setLanguage] = useState('English')
 
     // Handle resize to auto-close/open
