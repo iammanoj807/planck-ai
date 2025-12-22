@@ -2,8 +2,8 @@ import { useRef } from 'react'
 import { Send, Paperclip, Loader2, X, ChevronDown, FileText, Brain, Zap } from 'lucide-react'
 
 const MODELS = [
-    { id: 'gpt-4o', label: 'GPT-4o', icon: Brain, description: 'High Intelligence' },
-    { id: 'gpt-4o-mini', label: 'GPT-4o Mini', icon: Zap, description: 'High Speed' }
+    { id: 'gpt-4o', label: 'GPT-4o', icon: Brain, description: 'High Intelligence', context: '8k' },
+    { id: 'gpt-4o-mini', label: 'GPT-4o Mini', icon: Zap, description: 'High Speed', context: '8k' }
 ]
 
 export default function InputArea({
@@ -199,7 +199,7 @@ export default function InputArea({
                                             className="fixed inset-0 z-10"
                                             onClick={() => setShowModelMenu(false)}
                                         />
-                                        <div className={`absolute ${centered ? 'top-full mt-2' : 'bottom-full mb-2'} left-0 w-48 bg-black border border-zinc-800 rounded-xl shadow-xl z-30 overflow-hidden py-1 animate-fade-in`}>
+                                        <div className={`absolute ${centered ? 'top-full mt-2' : 'bottom-full mb-2'} left-0 w-64 bg-black border border-zinc-800 rounded-xl shadow-xl z-30 overflow-hidden py-1 animate-fade-in`}>
                                             {MODELS.map((model) => (
                                                 <button
                                                     key={model.id}
@@ -210,13 +210,17 @@ export default function InputArea({
                                                     }}
                                                     className={`
                                                       w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-zinc-900 transition-colors
-                                                      ${selectedModel === model.id ? 'text-pplx-accent bg-zinc-900' : 'text-zinc-400'}
+                                                      ${selectedModel === model.id ? 'bg-zinc-900/50' : ''}
                                                     `}
                                                 >
-                                                    <model.icon className="w-4 h-4" />
+                                                    <model.icon className={`w-4 h-4 ${selectedModel === model.id ? 'text-pplx-accent' : 'text-zinc-400'}`} />
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-medium">{model.label}</span>
-                                                        <span className="text-[10px] opacity-60">{model.description}</span>
+                                                        <span className={`text-sm font-medium ${selectedModel === model.id ? 'text-pplx-accent' : 'text-zinc-400'}`}>
+                                                            {model.label}
+                                                        </span>
+                                                        <span className="text-[10px] text-zinc-500">
+                                                            {model.description} • {model.context} Context
+                                                        </span>
                                                     </div>
                                                 </button>
                                             ))}
