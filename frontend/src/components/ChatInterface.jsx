@@ -6,8 +6,8 @@ import InputArea from './InputArea'
 import HeroSection from './HeroSection'
 
 const FOCUS_MODES = [
-    { id: 'web', label: 'Web Search', icon: Search, description: 'Search the internet' },
-    { id: 'chat', label: 'Chat Only', icon: MessageSquareText, description: 'Chat without searching' },
+    { id: 'web', label: 'Web Search', icon: Search, description: 'Connects to the internet to find real-time information, news, and citations for your queries.' },
+    { id: 'chat', label: 'Chat Only', icon: MessageSquareText, description: 'Uses purely the model\'s internal knowledge base for faster reasoning, coding, and creative writing without external search.' },
 ]
 
 /**
