@@ -102,12 +102,12 @@ export default function MessageBubble({ message }) {
     if (effectiveRateLimit) {
         return (
             <div className="flex justify-center my-4 animate-fade-in w-full">
-                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex flex-col items-center gap-2 min-w-[300px]">
-                    <Clock className="w-6 h-6 text-red-400 mb-1" />
-                    <div className="text-red-200 font-medium text-lg">
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 sm:p-4 flex flex-col items-center gap-2 w-auto max-w-[85%] mx-auto sm:w-auto sm:min-w-[300px]">
+                    <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-red-400 mb-1" />
+                    <div className="text-red-200 font-medium text-base sm:text-lg text-center leading-relaxed">
                         {message.model ? (message.model === 'gpt-4o' ? 'GPT-4o' : 'GPT-4o Mini') : 'API'} Rate Limit. Retry in:
                     </div>
-                    <div className="font-mono text-3xl font-bold text-red-400 tabular-nums tracking-wider">
+                    <div className="font-mono text-sm sm:text-2xl font-bold text-red-400 tabular-nums tracking-wider">
                         {formatTime(timeLeft)}
                     </div>
                 </div>
