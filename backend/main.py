@@ -195,7 +195,7 @@ async def chat(request: ChatRequest):
                 conversation_id,
                 "assistant",
                 full_response,
-                metadata={"tool_calls": tool_calls, "model": request.model}
+                metadata={"tool_calls": tool_calls, "model": request.model, "language": language}
             )
             
         # Send done signal

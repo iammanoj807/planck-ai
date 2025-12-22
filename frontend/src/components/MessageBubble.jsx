@@ -91,7 +91,7 @@ export default function MessageBubble({ message }) {
             return "**Message Limit Reached (Free Tier)**\n\nConversation history exceeds the 8k token limit.\n\n**Solution:** Please start a new chat or try to reduce your input sentence."
         }
         if (isUser) {
-            return content.replace(/^\[Mode: .*?\]\s*/, '')
+            return content.replace(/^\[Mode: .*?\]\s*/, '').replace(/\[Language: .*?\]\s*/, '')
         }
         return content
     }
@@ -104,7 +104,9 @@ export default function MessageBubble({ message }) {
             <div className="flex justify-center my-4 animate-fade-in w-full">
                 <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex flex-col items-center gap-2 min-w-[300px]">
                     <Clock className="w-6 h-6 text-red-400 mb-1" />
-                    <div className="text-red-200 font-medium text-lg">API Rate Limit. Retry in:</div>
+                    <div className="text-red-200 font-medium text-lg">
+                        {message.model ? (message.model === 'gpt-4o' ? 'GPT-4o' : 'GPT-4o Mini') : 'API'} Rate Limit. Retry in:
+                    </div>
                     <div className="font-mono text-3xl font-bold text-red-400 tabular-nums tracking-wider">
                         {formatTime(timeLeft)}
                     </div>

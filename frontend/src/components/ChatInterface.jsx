@@ -271,7 +271,8 @@ export default function ChatInterface({
                                     role: 'assistant',
                                     content: `Rate Limit Hit. Please wait ${waitTimeCurrent}s.`,
                                     isRateLimit: true,
-                                    retryAfter: waitTimeCurrent
+                                    retryAfter: waitTimeCurrent,
+                                    model: selectedModel
                                 })
                             } else if (errorMsg.includes('tokens_limit_reached') || errorMsg.includes('413')) {
                                 onAddMessage({

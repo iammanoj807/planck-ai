@@ -103,6 +103,7 @@ class ConversationMemory:
                     "role": msg_metadata.get("role", "user"),
                     "timestamp": msg_metadata.get("timestamp"),
                     "model": msg_metadata.get("model"),
+                    "language": msg_metadata.get("language"),
                     "toolCalls": tool_calls,
                     "metadata": msg_metadata
                 })
