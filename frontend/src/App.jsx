@@ -162,6 +162,7 @@ function App() {
                         onAddMessage={handleAddMessage}
                         onConversationUpdate={handleConversationUpdate}
                         selectedModel={selectedModel}
+                        onSelectModel={setSelectedModel}
                         currentLanguage={language}
                     />
                 </main>

@@ -25,6 +25,7 @@ export default function ChatInterface({
     onAddMessage,
     onConversationUpdate,
     selectedModel, // New prop: 'gpt-4o' | 'gpt-4o-mini'
+    onSelectModel,
     currentLanguage = 'English'
 }) {
     const [input, setInput] = useState('')
@@ -35,6 +36,7 @@ export default function ChatInterface({
 
     const [focusMode, setFocusMode] = useState('web')
     const [showFocusMenu, setShowFocusMenu] = useState(false)
+    const [showModelMenu, setShowModelMenu] = useState(false)
     const [showScrollButton, setShowScrollButton] = useState(false)
 
     const messagesEndRef = useRef(null)
@@ -326,6 +328,10 @@ export default function ChatInterface({
             focusMode={focusMode}
             setFocusMode={setFocusMode}
             FOCUS_MODES={FOCUS_MODES}
+            selectedModel={selectedModel}
+            onSelectModel={onSelectModel}
+            showModelMenu={showModelMenu}
+            setShowModelMenu={setShowModelMenu}
         />
     )
 
