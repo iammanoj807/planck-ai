@@ -261,7 +261,7 @@ export default function ChatInterface({
                             typeChar(0)
                         } else if (data.type === 'error') {
                             const errorMsg = data.content || 'An unknown error occurred.'
-                            const rateLimitMatch = errorMsg.match(/Please wait (\d+\.?\d*)s before trying again/)
+                            const rateLimitMatch = errorMsg.match(/Retrying allowed in:\s*(\d+\.?\d*)s/) || errorMsg.match(/Please wait (\d+\.?\d*)s/)
 
                             if (rateLimitMatch) {
                                 const waitTimeCurrent = Math.ceil(parseFloat(rateLimitMatch[1]))
