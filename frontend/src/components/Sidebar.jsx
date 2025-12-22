@@ -85,9 +85,9 @@ export default function Sidebar({
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {conversations.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center text-pplx-muted pb-8">
-                        <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-50" />
-                        <p className="text-sm">No conversations yet</p>
-                        <p className="text-xs mt-1">Start chatting to create one</p>
+                        <MessageSquare className="w-14 h-14 mx-auto mb-4 opacity-40" />
+                        <p className="text-lg font-medium">No conversations yet</p>
+                        <p className="text-sm mt-1 opacity-70">Start chatting to create one</p>
                     </div>
                 ) : (
                     conversations.map((conv) => (
@@ -142,8 +142,6 @@ export default function Sidebar({
                     ))
                 )}
             </div>
-
-
         </aside>
     )
 }
