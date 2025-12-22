@@ -243,9 +243,16 @@ export default function InputArea({
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
                                 disabled={isLoading}
-                                className={`p-2 rounded-lg transition-colors ${isLoading ? 'text-zinc-600 cursor-not-allowed' : 'hover:bg-pplx-hover text-pplx-muted hover:text-pplx-accent'}`}
+                                className={`group/attach relative p-2 rounded-lg transition-colors ${isLoading ? 'text-zinc-600 cursor-not-allowed' : 'hover:bg-pplx-hover text-pplx-muted hover:text-pplx-accent'}`}
                             >
                                 <Paperclip className="w-5 h-5" />
+
+                                {/* Tooltip */}
+                                <div className={`absolute ${centered ? 'top-full mt-2' : 'bottom-full mb-2'} right-0 w-max px-2 py-1 bg-zinc-950 border border-white/10 rounded-lg shadow-xl opacity-0 group-hover/attach:opacity-100 invisible group-hover/attach:visible transition-all duration-200 z-50 pointer-events-none transform ${centered ? '-translate-y-1' : 'translate-y-1'} group-hover/attach:translate-y-0`}>
+                                    <span className="text-xs font-medium text-zinc-200 whitespace-nowrap">Attach File</span>
+                                    {/* Arrow */}
+                                    <div className={`absolute ${centered ? '-top-1 border-t' : '-bottom-1 border-b'} right-3 w-1.5 h-1.5 bg-zinc-950 border-l border-white/10 rotate-45`}></div>
+                                </div>
                             </button>
 
                             <button

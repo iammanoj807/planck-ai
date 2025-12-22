@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
-import { Search, MessageSquareText, ArrowDown } from 'lucide-react'
+import { Compass, MessageSquareText, ArrowDown } from 'lucide-react'
 import MessageBubble from './MessageBubble'
 import ReasoningPanel from './ReasoningPanel'
 import InputArea from './InputArea'
 import HeroSection from './HeroSection'
 
 const FOCUS_MODES = [
-    { id: 'web', label: 'Web Search', icon: Search, description: 'Connects to the internet to find real-time information, news, and citations for your queries.' },
+    { id: 'web', label: 'Web Search', icon: Compass, description: 'Connects to the internet to find real-time information, news, and citations for your queries.' },
     { id: 'chat', label: 'Chat Only', icon: MessageSquareText, description: 'Uses purely the model\'s internal knowledge base for faster reasoning, coding, and creative writing without external search.' },
 ]
 
