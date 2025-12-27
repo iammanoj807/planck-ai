@@ -32,7 +32,7 @@ export default function HeroSection({
                             <span className="text-sm font-medium text-white group-hover:text-violet-200 transition-colors">NeuroArc</span>
                             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500 text-white tracking-wide">NEW</span>
                             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-violet-500 text-white tracking-wide">FREE</span>
-                            <ExternalLink className="w-3 h-3 text-zinc-500 group-hover:text-violet-400 transition-colors ml-auto sm:ml-2" />
+                            <ExternalLink className="w-3.5 h-3.5 text-zinc-500 group-hover:text-violet-400 transition-colors ml-auto sm:ml-2" />
                         </div>
                         <div className="text-[13px] text-zinc-400 group-hover:text-zinc-300 truncate">
                             ATS-Friendly Job & CV Assistant
@@ -48,7 +48,7 @@ export default function HeroSection({
                             e.stopPropagation();
                             setShowBadge(false);
                         }}
-                        className="absolute right-2 top-2 z-20 pointer-events-auto p-1.5 text-zinc-500 hover:text-white rounded-full hover:bg-white/10 transition-colors"
+                        className="absolute right-2 top-1 md:top-2 z-20 pointer-events-auto p-1.5 text-zinc-500 hover:text-white rounded-full hover:bg-white/10 transition-colors"
                         title="Dismiss"
                     >
                         <X size={14} />
