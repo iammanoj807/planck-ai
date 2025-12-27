@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Menu, Sparkles, ExternalLink } from 'lucide-react'
+import { Menu, Sparkles, ExternalLink, X } from 'lucide-react'
 
 // ... LANGUAGES array remains same ...
 
@@ -26,7 +26,7 @@ const LANGUAGES = [
     { code: 'Thai', flag: '🇹🇭', label: 'Thai' },
 ]
 
-export default function Header({ onToggleSidebar, onNewChat, currentLanguage = 'English', onLanguageChange }) {
+export default function Header({ onToggleSidebar, isSidebarOpen, onNewChat, currentLanguage = 'English', onLanguageChange }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const currentLangObj = LANGUAGES.find(l => l.code === currentLanguage) || LANGUAGES[0]
 
@@ -38,7 +38,11 @@ export default function Header({ onToggleSidebar, onNewChat, currentLanguage = '
                     onClick={onToggleSidebar}
                     className="p-2 rounded-lg hover:bg-slate-700/50 transition-colors lg:hidden"
                 >
-                    <Menu className="w-5 h-5 text-slate-300" />
+                    {isSidebarOpen ? (
+                        <X className="w-5 h-5 text-slate-300" />
+                    ) : (
+                        <Menu className="w-5 h-5 text-slate-300" />
+                    )}
                 </button>
 
                 <div className="flex items-center gap-3 lg:hidden">

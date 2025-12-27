@@ -126,6 +126,7 @@ function App() {
                 {/* Header */}
                 <Header
                     onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+                    isSidebarOpen={sidebarOpen}
                     onNewChat={handleNewChat}
                     currentLanguage={language}
                     onLanguageChange={setLanguage}
