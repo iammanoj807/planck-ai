@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Menu, Sparkles } from 'lucide-react'
+import { Menu, Sparkles, ExternalLink } from 'lucide-react'
 
 // ... LANGUAGES array remains same ...
 
@@ -52,8 +52,8 @@ export default function Header({ onToggleSidebar, onNewChat, currentLanguage = '
                 </div>
             </div>
 
-            {/* Right section - Language Selector */}
-            <div className="flex items-center gap-2">
+            {/* Right section - Language Selector & Promos */}
+            <div className="flex items-center gap-3">
                 <div
                     className="relative"
                     onMouseEnter={() => setIsDropdownOpen(true)}

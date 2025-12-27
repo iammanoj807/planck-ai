@@ -6,15 +6,21 @@ colorTo: blue
 sdk: docker
 app_port: 7860
 pinned: false
+short_description: 'Planck AI: Agentic search with reasoning and web access.'
 ---
 
-# Planck AI <img src="frontend/public/planck-logo.svg" width="40" height="40" align="center" />
+<div align="center">
+  <img src="frontend/public/planck-logo.svg" alt="Logo" width="100" />
+  <h1>Planck AI</h1>
+  <h3>Your Autonomous Reasoning Engine for the Web.</h3>
+  <p><strong>Think -> Search -> Solve</strong></p>
+</div>
 
-> **Your Autonomous Reasoning Engine for the Web.**
-> *Think. Search. Solve.*
+---
 
-Planck AI is an advanced agentic search interface that combines the reasoning power of **GPT-4o** and **GPT-4o Mini** with real-time web access. Unlike traditional chatbots, Planck AI thinks before it speaks—breaking down complex queries into steps, searching multiple sources, reading deep into documents, and verifying facts before giving you an answer.
+## ✨ Overview
 
+**Planck AI** is an advanced agentic search interface that combines the reasoning power of **GPT-4o** and **GPT-4o Mini** with real-time web access. Unlike traditional chatbots, Planck AI thinks before it speaks—breaking down complex queries into steps, searching multiple sources, reading deep into documents, and verifying facts before giving you an answer.
 ## 🚀 Features
 
 - **🧠 Agentic Reasoning**: Uses a multi-step "Thinking" process to plan, execute, and verify tasks.
