@@ -31,7 +31,7 @@ export default function HeroSection({
                     <div className="text-[13px] text-zinc-400 group-hover:text-zinc-300 truncate">
                         ATS-Friendly Job & CV Assistant
                     </div>
-                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                    <div className="hidden sm:flex items-center gap-1.5 mt-0.5 flex-wrap">
                         <span className="text-[11px] font-medium text-violet-400/90 group-hover:text-violet-300 whitespace-nowrap">Search Jobs</span>
                         <span className="text-[11px] text-zinc-600">→</span>
                         <span className="text-[11px] font-medium text-violet-400/90 group-hover:text-violet-300 whitespace-nowrap">Match CV</span>
