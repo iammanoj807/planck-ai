@@ -49,16 +49,16 @@ export default function Sidebar({
     return (
         <aside
             className={`
-        fixed lg:relative inset-y-0 left-0 z-40
+        fixed min-[1261px]:relative inset-y-0 left-0 z-40
         w-96 bg-[#151616]
         transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0'}
+        ${isOpen ? 'translate-x-0' : '-translate-x-full min-[1261px]:translate-x-0 min-[1261px]:w-0 min-[1261px]:opacity-0'}
         flex flex-col
-        mt-[73px] lg:mt-0
+        mt-[73px] min-[1261px]:mt-0
       `}
         >
             {/* Logo Area (Desktop) */}
-            <div className="p-4 pl-6 pt-8 hidden lg:block">
+            <div className="p-4 pl-6 pt-8 hidden min-[1261px]:block">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-pplx-accent flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity" title="Planck AI">
                         <Sparkles className="w-4 h-4 text-white" />

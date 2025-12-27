@@ -18,14 +18,14 @@ function App() {
     const [activeConversation, setActiveConversation] = useState(null)
     const [messages, setMessages] = useState([])
     // Sidebar defaults to open on large screens, closed on mobile
-    const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1024)
+    const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1261)
     const [selectedModel, setSelectedModel] = useState('gpt-4o')
     const [language, setLanguage] = useState('English')
 
     // Handle resize to auto-close/open
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth >= 1024) {
+            if (window.innerWidth >= 1261) {
                 setSidebarOpen(true)
             } else {
                 setSidebarOpen(false)
@@ -42,7 +42,7 @@ function App() {
     const handleNewChat = useCallback(() => {
         setActiveConversation(null)
         setMessages([])
-        if (window.innerWidth < 1024) setSidebarOpen(false)
+        if (window.innerWidth < 1261) setSidebarOpen(false)
     }, [])
 
     /**
@@ -51,7 +51,7 @@ function App() {
      */
     const handleSelectConversation = useCallback(async (conversationId) => {
         setActiveConversation(conversationId)
-        if (window.innerWidth < 1024) setSidebarOpen(false)
+        if (window.innerWidth < 1261) setSidebarOpen(false)
 
         try {
             const response = await fetch(`/conversations/${conversationId}`)
@@ -136,7 +136,7 @@ function App() {
                 <button
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                     className={`
-                        hidden lg:flex items-center justify-center
+                        hidden min-[1261px]:flex items-center justify-center
                         absolute top-1/2 -translate-y-1/2 z-50
                         w-6 h-12
                         bg-pplx-card border border-l-0 border-pplx-border
