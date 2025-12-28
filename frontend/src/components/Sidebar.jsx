@@ -149,36 +149,16 @@ export default function Sidebar({
                     href="https://huggingface.co/spaces/manojthapaa/NeuroArc"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block group relative overflow-hidden rounded-xl border border-pplx-border hover:border-violet-500/50 transition-all duration-300 bg-gradient-to-br from-[#1c1c1c] to-[#151515] p-3"
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl border border-transparent hover:border-violet-500/30 hover:bg-violet-500/10 transition-all duration-300 group"
                 >
-                    <div className="flex items-start justify-between mb-2">
-                        <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center group-hover:bg-violet-500/20 transition-colors">
-                            <img src="/neuroarc.svg" alt="NeuroArc" className="w-5 h-5 opacity-80 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                        <ExternalLink className="w-3 h-3 text-pplx-muted group-hover:text-violet-400 transition-colors" />
+                    <div className="w-6 h-6 rounded-md bg-violet-500/10 flex items-center justify-center group-hover:bg-violet-500/20 transition-colors">
+                        <img src="/neuroarc.svg" alt="" className="w-4 h-4 opacity-80 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                            <h3 className="text-sm font-medium text-pplx-text group-hover:text-violet-200 transition-colors">NeuroArc</h3>
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500 text-white tracking-wide">NEW</span>
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-violet-500 text-white tracking-wide">FREE</span>
-                            <span className="text-[10px] text-zinc-500">• By Planck AI Creator</span>
-                        </div>
-                        <p className="text-[13px] text-pplx-muted line-clamp-2 group-hover:text-zinc-400 transition-colors">
-                            ATS-Friendly Job & CV Assistant
-                        </p>
-                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                            <span className="text-[11px] font-medium text-violet-400/90 group-hover:text-violet-300">Search Jobs</span>
-                            <span className="text-[11px] text-zinc-600">→</span>
-                            <span className="text-[11px] font-medium text-violet-400/90 group-hover:text-violet-300">Match CV</span>
-                            <span className="text-[11px] text-zinc-600">→</span>
-                            <span className="text-[11px] font-medium text-violet-400/90 group-hover:text-violet-300">Tailor</span>
-                            <span className="text-[11px] text-zinc-600">→</span>
-                            <span className="text-[11px] font-bold text-violet-400 group-hover:text-violet-200">Apply</span>
-                        </div>
+                    <div className="flex-1 min-w-0 flex items-center gap-2">
+                        <span className="text-sm font-medium text-pplx-text group-hover:text-violet-200 transition-colors">Try NeuroArc</span>
+                        <span className="text-[10px] font-bold px-1 py-0.5 rounded bg-violet-500 text-white leading-none">FREE</span>
                     </div>
-                    {/* Hover Glow Effect */}
-                    <div className="absolute inset-0 bg-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                    <ExternalLink className="w-3.5 h-3.5 text-pplx-muted group-hover:text-violet-400 transition-colors" />
                 </a>
             </div>
         </aside>
