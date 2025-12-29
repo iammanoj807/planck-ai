@@ -156,7 +156,7 @@ export default function Sidebar({
                     </div>
                     <div className="flex-1 min-w-0 flex items-center gap-2">
                         <span className="text-sm font-medium text-pplx-text group-hover:text-violet-200 transition-colors">Try NeuroArc</span>
-                        <span className="text-[10px] font-bold px-1 py-0.5 rounded bg-violet-500 text-white leading-none">FREE</span>
+                        <span className="text-[10px] font-bold px-1 py-0.5 rounded bg-emerald-700 text-white leading-none">NEW</span>
                     </div>
                     <ExternalLink className="w-3.5 h-3.5 text-pplx-muted group-hover:text-violet-400 transition-colors" />
                 </a>

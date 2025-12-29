@@ -1,60 +1,12 @@
-import { useRef, useState } from 'react'
-import { ExternalLink, X } from 'lucide-react'
-
 export default function HeroSection({
-    setInput,
-    setFocusMode,
-    FOCUS_MODES,
     children
 }) {
-    const [showBadge, setShowBadge] = useState(true);
+
 
     return (
         <div className="h-full flex flex-col items-center justify-center px-4 relative pb-32">
 
-            {/* Featured Project Floating Badge (Responsive) */}
-            {showBadge && (
-                <div className="absolute left-1/2 -translate-x-1/2 top-4 md:top-0 flex items-center gap-3 px-3 py-2 md:px-4 md:py-3 rounded-2xl bg-zinc-900/40 border border-violet-500/30 hover:border-violet-500/60 hover:bg-zinc-900/60 transition-all duration-300 group backdrop-blur-md animate-fade-in-down shadow-[0_0_15px_-3px_rgba(139,92,246,0.2)] origin-top max-w-[calc(100vw-2rem)] md:max-w-none pr-8">
-                    <a
-                        href="https://huggingface.co/spaces/manojthapaa/NeuroArc"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute inset-0 z-0 rounded-2xl"
-                        aria-label="View NeuroArc Project"
-                    />
 
-                    <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center group-hover:bg-violet-500/20 transition-colors shrink-0 relative z-10 pointer-events-none">
-                        <img src="/neuroarc.svg" alt="" className="w-6 h-6 opacity-90" />
-                    </div>
-
-                    <div className="flex flex-col gap-1 min-w-0 relative z-10 pointer-events-none">
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-medium text-white group-hover:text-violet-200 transition-colors">NeuroArc</span>
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500 text-white tracking-wide">NEW</span>
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-violet-500 text-white tracking-wide">FREE</span>
-                            <ExternalLink className="w-3.5 h-3.5 text-zinc-500 group-hover:text-violet-400 transition-colors ml-auto sm:ml-2" />
-                        </div>
-                        <div className="text-[13px] text-zinc-400 group-hover:text-zinc-300 truncate">
-                            ATS-Friendly Job & CV Assistant
-                        </div>
-                        <div className="text-[10px] text-zinc-500">
-                            By Planck AI Creator
-                        </div>
-                    </div>
-
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setShowBadge(false);
-                        }}
-                        className="absolute right-2 top-1 md:top-2 z-20 pointer-events-auto p-1.5 text-zinc-500 hover:text-white rounded-full hover:bg-white/10 transition-colors"
-                        title="Dismiss"
-                    >
-                        <X size={14} />
-                    </button>
-                </div>
-            )}
 
             <div className="mb-12 flex flex-col items-center text-center max-[566px]:mt-44">
                 <div className="mb-6 hidden md:block">
