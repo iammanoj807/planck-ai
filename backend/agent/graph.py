@@ -152,49 +152,53 @@ class AgentRunner:
         # Generation config
         generation_config = genai.types.GenerationConfig(
             candidate_count=1,
-            max_output_tokens=65536, # User requested higher output context (experimental support)
+            max_output_tokens=60000, # User requested exactly 60k limit
             temperature=0.7
         )
         
-        response = await chat.send_message_async(last_msg, stream=True, generation_config=generation_config)
-        
-        async for chunk in response:
-            # Check for function calls
-            # Gemini chunks might contain function calls OR text
+        try:
+            response = await chat.send_message_async(last_msg, stream=True, generation_config=generation_config)
             
-            # Map to OpenAI format for the frontend/agent loop to consume consistently
-            # 1. Text
-            if chunk.text:
-                 yield {
-                     "choices": [{
-                         "delta": {"content": chunk.text},
-                         "finish_reason": None
-                     }]
-                 }
-            
-            # 2. Function calls (Google SDK handles this differently, usually getting a full Part)
-            # If parts have function call:
-            for part in chunk.parts:
-                if fn := part.function_call:
-                    # Convert to OpenAI tool call format
-                    # We need a dummy ID
-                    call_id = f"call_{uuid.uuid4().hex[:8]}"
-                    yield {
-                        "choices": [{
-                            "delta": {
-                                "tool_calls": [{
-                                    "index": 0,
-                                    "id": call_id,
-                                    "type": "function",
-                                    "function": {
-                                        "name": fn.name,
-                                        "arguments": json.dumps(dict(fn.args))
-                                    }
-                                }]
-                            },
-                             "finish_reason": "tool_calls"
-                        }]
-                    }
+            async for chunk in response:
+                # Check for function calls
+                # Gemini chunks might contain function calls OR text
+                
+                # Map to OpenAI format for the frontend/agent loop to consume consistently
+                # 1. Text
+                if chunk.text:
+                     yield {
+                         "choices": [{
+                             "delta": {"content": chunk.text},
+                             "finish_reason": None
+                         }]
+                     }
+                
+                # 2. Function calls
+                for part in chunk.parts:
+                    if fn := part.function_call:
+                        call_id = f"call_{uuid.uuid4().hex[:8]}"
+                        yield {
+                            "choices": [{
+                                "delta": {
+                                    "tool_calls": [{
+                                        "index": 0,
+                                        "id": call_id,
+                                        "type": "function",
+                                        "function": {
+                                            "name": fn.name,
+                                            "arguments": json.dumps(dict(fn.args))
+                                        }
+                                    }]
+                                },
+                                 "finish_reason": "tool_calls"
+                            }]
+                        }
+        except Exception as e:
+            # Check for Rate Limit (ResourceExhausted 429)
+            if "429" in str(e) or "ResourceExhausted" in str(e) or "quota" in str(e).lower():
+                 # Default to 60s wait if we can't parse it, as Google often doesn't give a retry-after header in the exception message
+                 raise Exception(f"API Rate Limit Hit. Retrying allowed in: 60s")
+            raise e
 
     async def _call_llm(
         self,
