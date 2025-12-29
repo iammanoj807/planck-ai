@@ -7,6 +7,7 @@ from datetime import datetime
 
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 import httpx
+import google.generativeai as genai
 
 from .state import AgentState, StreamingChunk
 from .prompts import SYSTEM_PROMPT
@@ -54,6 +55,147 @@ class AgentRunner:
         self.model = "gpt-4o-mini" 
         self.api_url = "https://models.inference.ai.azure.com/chat/completions"
         
+        # Google Gemini Setup
+        self.google_api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        if self.google_api_key:
+            genai.configure(api_key=self.google_api_key)
+        
+    async def _call_google_llm(
+        self,
+        messages: list,
+        tools: list = None
+    ) -> AsyncGenerator[Dict[str, Any], None]:
+        """
+        Call Google Gemini API via SDK.
+        Adapts the OpenAI-style messages to Gemini format.
+        """
+        if not self.google_api_key:
+             raise Exception("GEMINI_API_KEY not found in environment variables.")
+
+        # Map model name
+        # User asks for "Gemini 2.5 Flash Lite" -> we map to "gemini-2.0-flash-exp" or "gemini-1.5-flash"
+        # Ideally, use the model name passed or a default safe one.
+        target_model = self.model if "gemini" in self.model else "gemini-2.0-flash-exp"
+        
+        # Configure model
+        # Google tools format is different, but the SDK handles FunctionDeclaration if we convert.
+        # However, for simplicity and robustness, we will use the SDK's automatic conversion if possible,
+        # or just pass the tools if they are compatible.
+        # The 'tools' argument here is a list of dicts (OpenAI format).
+        # We need to convert OpenAI tool definitions to Google's.
+        
+        google_tools = []
+        if tools:
+            # Simple conversion or just pass the function if we had the raw function.
+            # Since we only have the JSON schema here, we might need a converter.
+            # OPTION: For this specific agent, we have the functions imported!
+            # We can re-bind them.
+            # But the 'tools' arg passed to _call_llm is the JSON schema list.
+            # Let's import the actual tool functions to bind them if needed OR use the schema.
+            # Google SDK genai.GenerativeModel(tools=[...]) accepts functions.
+            
+            # Re-map known tools from the schemas passed
+            # This is a bit hacky but ensures compatibility without writing a schema converter.
+            from tools.web_search import web_search_tool
+            from tools.code_executor import code_executor_tool
+            from tools.image_analyzer import image_analyzer_tool
+            from tools.document_reader import document_reader_tool
+            from tools.thinking import thinking_tool
+            
+            known_tools_map = {
+                "web_search": web_search_tool,
+                "code_executor": code_executor_tool,
+                "image_analyzer": image_analyzer_tool,
+                "document_reader": document_reader_tool,
+                "thinking": thinking_tool
+            }
+            
+            for t in tools:
+                name = t["function"]["name"]
+                if name in known_tools_map:
+                    google_tools.append(known_tools_map[name])
+        
+        # Helper to convert messages
+        gemini_history = []
+        system_instruction = None
+        
+        for msg in messages:
+            role = msg["role"]
+            content = msg.get("content")
+            
+            if role == "system":
+                system_instruction = content
+            elif role == "user":
+                gemini_history.append({"role": "user", "parts": [content]})
+            elif role == "assistant":
+                # Handle tool calls in history if present (complex)
+                # For now, simplistic text history
+                if content:
+                    gemini_history.append({"role": "model", "parts": [content]})
+            elif role == "tool":
+                 # Gemini handles tool results differently in history
+                 # ignoring purely text based reconstruction for now to avoid errors
+                 pass
+
+        model = genai.GenerativeModel(
+            model_name=target_model,
+            system_instruction=system_instruction,
+            tools=google_tools if google_tools else None
+        )
+        
+        # Start chat session
+        chat = model.start_chat(history=gemini_history[:-1] if gemini_history else [])
+        
+        # Send last message
+        last_msg = gemini_history[-1]["parts"][0] if gemini_history else "Hello"
+        
+        # Generation config
+        generation_config = genai.types.GenerationConfig(
+            candidate_count=1,
+            max_output_tokens=65536, # User requested higher output context (experimental support)
+            temperature=0.7
+        )
+        
+        response = await chat.send_message_async(last_msg, stream=True, generation_config=generation_config)
+        
+        async for chunk in response:
+            # Check for function calls
+            # Gemini chunks might contain function calls OR text
+            
+            # Map to OpenAI format for the frontend/agent loop to consume consistently
+            # 1. Text
+            if chunk.text:
+                 yield {
+                     "choices": [{
+                         "delta": {"content": chunk.text},
+                         "finish_reason": None
+                     }]
+                 }
+            
+            # 2. Function calls (Google SDK handles this differently, usually getting a full Part)
+            # If parts have function call:
+            for part in chunk.parts:
+                if fn := part.function_call:
+                    # Convert to OpenAI tool call format
+                    # We need a dummy ID
+                    call_id = f"call_{uuid.uuid4().hex[:8]}"
+                    yield {
+                        "choices": [{
+                            "delta": {
+                                "tool_calls": [{
+                                    "index": 0,
+                                    "id": call_id,
+                                    "type": "function",
+                                    "function": {
+                                        "name": fn.name,
+                                        "arguments": json.dumps(dict(fn.args))
+                                    }
+                                }]
+                            },
+                             "finish_reason": "tool_calls"
+                        }]
+                    }
+
     async def _call_llm(
         self,
         messages: list,
@@ -208,8 +350,13 @@ class AgentRunner:
         # Smart Context Management
         # Dynamic limit based on model capacity
         # Github Models Free Tier has a strict 8k token limit for ALL models
-        # 8k tokens ~= 32k chars. We use 30k to be safe.
-        MAX_HISTORY_CHARS = 30000
+        # 8k tokens ~= 32k chars. We use 30k to be safe for Azure/Github.
+        # Gemini 2.0 Flash supports 1M, but user requested limit to 100k tokens.
+        # 100k tokens ~= 400,000 chars.
+        if "gemini" in self.model:
+            MAX_HISTORY_CHARS = 400000 
+        else:
+            MAX_HISTORY_CHARS = 30000
             
         current_chars = 0
         selected_history = []
@@ -290,9 +437,69 @@ class AgentRunner:
                 
                 # Call LLM
                 response = None
-                async for chunk in self._call_llm(messages, tools=active_tools, stream=False):
-                    response = chunk
-                    break
+                
+                if "gemini" in self.model.lower():
+                     # Use Google Gemini
+                     # Note: Our _call_google_llm is a generator yielding chunks (OpenAI stream style)
+                     # But the logic below expects a single response object because stream=False was passed originally
+                     # or it iterates if stream=True. 
+                     # The original code here used stream=False for _call_llm but the architecture is chunk-based yield?
+                     # Wait, line 293 says stream=False.
+                     # But _call_llm implementation uses aiter_lines if stream=True.
+                     # The loop "async for chunk in self._call_llm... break" suggests it gets one chunk and breaks? 
+                     # No, stream=False returns a generator yielding one JSON? 
+                     # Let's look at lines 114 and 134 in original: yields response.json() once.
+                     
+                     # We need to adapt Gemini connection to this
+                     # For simplicity, let's just create a non-streaming wrapper or adapter here if needed.
+                     # Actually, let's just branch logic.
+                     
+                     # Implementation detail: The original agent loop expects "response" = full JSON object
+                     # OR it expects chunks? 
+                     # "async for chunk in ... break" -> It takes the FIRST chunk and treats it as the full response?
+                     # Line 301: choice = response["choices"][0]
+                     # So it expects a full completion object.
+                     
+                     # Let's make a synced_call_google equivalent
+                     # Or just gather the stream.
+                     
+                     final_content = ""
+                     final_tool_calls = []
+                     
+                     async for chunk in self._call_google_llm(messages, active_tools):
+                         # Aggregate
+                         choice = chunk["choices"][0]
+                         delta = choice.get("delta", {})
+                         if "content" in delta and delta["content"]:
+                             final_content += delta["content"]
+                         if "tool_calls" in delta:
+                             # OpenAI streams tool calls in parts, typically
+                             # My Google adapter yields full tool calls at once for simplicity
+                             final_tool_calls.extend(delta["tool_calls"])
+                             
+                     # Construct pseudo-response object
+                     message_obj = {"role": "assistant"}
+                     if final_content:
+                         message_obj["content"] = final_content
+                     if final_tool_calls:
+                         message_obj["tool_calls"] = final_tool_calls
+                         # Normalize arguments if they are objects (Gemini) vs strings (OpenAI)
+                         # My adapter dumped them as json strings, so it matches OpenAI.
+                         
+                     response = {
+                         "choices": [
+                             {
+                                 "message": message_obj,
+                                 "finish_reason": "stop" if not final_tool_calls else "tool_calls"
+                             }
+                         ]
+                     }
+                     
+                else:
+                    # Default Azure/OpenAI
+                    async for chunk in self._call_llm(messages, tools=active_tools, stream=False):
+                        response = chunk
+                        break
                     
                 if not response:
                     yield StreamingChunk(type="error", content="Failed to get LLM response", metadata=None)

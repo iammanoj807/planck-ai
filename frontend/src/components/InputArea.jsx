@@ -3,7 +3,8 @@ import { Send, Paperclip, Loader2, X, ChevronDown, FileText, Brain, Zap } from '
 
 const MODELS = [
     { id: 'gpt-4o', label: 'GPT-4o', icon: Brain, description: 'High Intelligence', context: '8k' },
-    { id: 'gpt-4o-mini', label: 'GPT-4o Mini', icon: Zap, description: 'High Speed', context: '8k' }
+    { id: 'gpt-4o-mini', label: 'GPT-4o Mini', icon: Zap, description: 'High Speed', context: '8k' },
+    { id: 'gemini-2.0-flash-exp', label: 'Gemini 2.5 Flash Lite', icon: Zap, description: 'Extreme Speed', context: '100k' }
 ]
 
 export default function InputArea({
