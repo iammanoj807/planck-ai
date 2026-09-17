@@ -10,7 +10,7 @@ import ChatInterface from './components/ChatInterface'
  * Manages the global state of the application:
  * - Conversations list and active conversation
  * - Sidebar visibility (responsive)
- * - Selected AI Model (Gemini 3.6 Flash vs Gemini 2.5 Pro)
+ * - Selected AI Model (Groq 120B vs Groq 20B)
  * - Theme and layout structure
  */
 function App() {
@@ -19,7 +19,7 @@ function App() {
     const [messages, setMessages] = useState([])
     // Sidebar defaults to open on large screens, closed on mobile
     const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1261)
-    const [selectedModel, setSelectedModel] = useState('gemini-3.6-flash')
+    const [selectedModel, setSelectedModel] = useState('openai/gpt-oss-120b')
     const [language, setLanguage] = useState('English')
 
     // Handle resize to auto-close/open

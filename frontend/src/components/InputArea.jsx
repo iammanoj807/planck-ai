@@ -2,8 +2,8 @@ import { useRef } from 'react'
 import { Send, Paperclip, Loader2, X, ChevronDown, FileText, Brain, Zap } from 'lucide-react'
 
 const MODELS = [
-    { id: 'gemini-3.6-flash', label: 'Gemini 3.6 Flash', icon: Zap, description: 'High Speed & Reasoning', context: '1M' },
-    { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', icon: Brain, description: 'Deep Intelligence', context: '2M' }
+    { id: 'openai/gpt-oss-120b', label: 'Groq 120B', icon: Zap, description: 'Fast & Powerful', context: '8K' },
+    { id: 'openai/gpt-oss-20b', label: 'Groq 20B', icon: Brain, description: 'Lightweight & Quick', context: '8K' }
 ]
 
 export default function InputArea({
