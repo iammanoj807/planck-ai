@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 """LangGraph agent implementation for Planck AI"""
 import os
 import json
@@ -20,8 +22,8 @@ from tools.thinking import thinking_tool, THINKING_TOOL_DEF
 # Tool definitions for the model
 
 # Tools allowed in Web Search Mode
+# NOTE: thinking tool removed - Gemini reasons internally, saves rate limit quota
 TOOLS = [
-    THINKING_TOOL_DEF,
     WEB_SEARCH_TOOL_DEF,
     CODE_EXECUTOR_TOOL_DEF,
     IMAGE_ANALYZER_TOOL_DEF,
@@ -30,7 +32,6 @@ TOOLS = [
 
 # Tools allowed in Chat Mode (No Web Search)
 CHAT_TOOLS = [
-    THINKING_TOOL_DEF,
     CODE_EXECUTOR_TOOL_DEF,
     IMAGE_ANALYZER_TOOL_DEF,
     DOCUMENT_READER_TOOL_DEF
@@ -49,10 +50,9 @@ class AgentRunner:
     """
     
     def __init__(self):
-        self.token = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or os.getenv("GITHUB_TOKEN")
-        # Upgrade to GPT-4o for larger context (128k) and better reasoning
-        self.model = "gemini-3.6-flash" 
-        self.api_url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+        self.token = os.getenv("GROQ_API_KEY")
+        self.model = "openai/gpt-oss-120b"
+        self.api_url = "https://api.groq.com/openai/v1/chat/completions"
         
     async def _call_llm(
         self,
@@ -74,9 +74,9 @@ class AgentRunner:
         payload = {
             "model": self.model,
             "messages": messages,
-            # GPT-4o supports 128k context. We can be generous.
-            # But the output token limit is still 4096.
-            "max_tokens": 4096,
+            # Keep max_tokens low to stay within Groq's 8000 TPM free-tier limit.
+            # Tool-calling steps rarely need more than 500 tokens; final answers get 1500.
+            "max_tokens": 1500,
             "temperature": 0.7,
         }
         
@@ -87,51 +87,63 @@ class AgentRunner:
         if stream:
             payload["stream"] = True
             
+        # Exponential backoff retry for rate limits (Gemini free tier: 15 RPM)
+        max_retries = 5
+        base_wait = 10  # seconds
+        
         async with httpx.AsyncClient(timeout=120.0) as client:
-            if stream:
-                async with client.stream("POST", self.api_url, headers=headers, json=payload) as response:
-                    async for line in response.aiter_lines():
-                        if line.startswith("data: "):
-                            data = line[6:]
-                            if data == "[DONE]":
-                                break
-                            try:
-                                yield json.loads(data)
-                            except json.JSONDecodeError:
-                                continue
-                                
-                    # Check final headers if available (httpx stream context)
-                    # Note: httpx stream() context manager handles response.
+            for attempt in range(max_retries):
+                if stream:
+                    async with client.stream("POST", self.api_url, headers=headers, json=payload) as response:
+                        if response.status_code == 429:
+                            retry_after = response.headers.get("Retry-After")
+                            wait_time = int(retry_after) if retry_after else (base_wait * (2 ** attempt))
+                            print(f"DEBUG: Rate limited (stream). Waiting {wait_time}s before retry {attempt+1}/{max_retries}")
+                            await asyncio.sleep(wait_time)
+                            continue
+                        async for line in response.aiter_lines():
+                            if line.startswith("data: "):
+                                data = line[6:]
+                                if data == "[DONE]":
+                                    break
+                                try:
+                                    yield json.loads(data)
+                                except json.JSONDecodeError:
+                                    continue
+                    return  # stream done
+                else:
+                    response = await client.post(self.api_url, headers=headers, json=payload)
+                    
+                    # Check for rate limit headers
+                    self._update_rate_limits(response.headers)
+                    
                     if response.status_code == 429:
-                         retry_after = response.headers.get("Retry-After")
-                         wait_time = int(retry_after) if retry_after else 60
-                         raise Exception(f"API Rate Limit Hit. Retrying allowed in: {wait_time}s")
-
-            else:
-                response = await client.post(self.api_url, headers=headers, json=payload)
-                
-                # Check for rate limit headers
-                self._update_rate_limits(response.headers)
-                
-                if response.status_code == 429:
-                    retry_after = response.headers.get("Retry-After")
-                    reset_time = response.headers.get("x-ratelimit-reset-requests")
-                    
-                    wait_time = 0
-                    if retry_after:
-                        wait_time = int(retry_after)
-                    elif reset_time:
-                        try:
-                            wait_time = float(reset_time)
-                        except (ValueError, TypeError):
-                            wait_time = 60 # Default fallback
-                            
-                    # Format for frontend parsing
-                    raise Exception(f"API Rate Limit Hit. Retrying allowed in: {wait_time}s")
-                    
-                if response.status_code != 200:
-                    raise Exception(f"API error: {response.status_code} - {response.text}")
-                yield response.json()
+                        retry_after = response.headers.get("Retry-After")
+                        reset_time = response.headers.get("x-ratelimit-reset-requests")
+                        
+                        wait_time = base_wait * (2 ** attempt)
+                        if retry_after:
+                            try:
+                                wait_time = int(retry_after)
+                            except (ValueError, TypeError):
+                                pass
+                        elif reset_time:
+                            try:
+                                wait_time = float(reset_time)
+                            except (ValueError, TypeError):
+                                pass
+                        
+                        print(f"DEBUG: Rate limited. Waiting {wait_time}s before retry {attempt+1}/{max_retries}")
+                        await asyncio.sleep(wait_time)
+                        continue
+                        
+                    if response.status_code != 200:
+                        raise Exception(f"API error: {response.status_code} - {response.text}")
+                    yield response.json()
+                    return  # success
+            
+            # All retries exhausted
+            raise Exception("API Rate Limit: Max retries exceeded. Please wait a minute and try again.")
 
     def _update_rate_limits(self, headers: Dict[str, str]):
         """Update cached rate limits from headers."""
@@ -180,14 +192,11 @@ class AgentRunner:
             StreamingChunk objects representing partial updates (thinking, tool usage, tokens).
         """
         
-        # Set model for this run
-        # Map legacy models if requested
-        if model_name in ["gpt-4o-mini", "mini"]:
-            self.model = "gemini-3.6-flash"
-        elif model_name in ["gpt-4o", "4o"]:
-            self.model = "gemini-2.5-pro"
+        # Set model for this run — using Groq-hosted models with tool calling support
+        if model_name in ["gpt-4o-mini", "mini", "gemini-3.6-flash", "openai/gpt-oss-20b"]:
+            self.model = "openai/gpt-oss-20b"
         else:
-            self.model = model_name or "gemini-3.6-flash" 
+            self.model = "openai/gpt-oss-120b"
         
 
         # Select prompt and tools based on mode
@@ -215,7 +224,7 @@ class AgentRunner:
         # Dynamic limit based on model capacity
         # Github Models Free Tier has a strict 8k token limit for ALL models
         # 8k tokens ~= 32k chars. We use 30k to be safe.
-        MAX_HISTORY_CHARS = 30000
+        MAX_HISTORY_CHARS = 8000  # Keep context small to stay within 8000 TPM
             
         current_chars = 0
         selected_history = []
@@ -311,6 +320,9 @@ class AgentRunner:
                 tool_calls = message.get("tool_calls", [])
                 
                 if tool_calls:
+                    # Append full assistant message preserving thought_signature & all tool_calls
+                    messages.append(dict(message))
+                    
                     # Process each tool call
                     for tool_call in tool_calls:
                         func = tool_call["function"]
@@ -343,20 +355,11 @@ class AgentRunner:
                             }
                         )
                         
-                        # Add to messages
-                        messages.append({
-                            "role": "assistant",
-                            "content": None,
-                            "tool_calls": [{
-                                "id": tool_call["id"],
-                                "type": "function",
-                                "function": func
-                            }]
-                        })
+                        # Add tool result message
                         messages.append({
                             "role": "tool",
                             "tool_call_id": tool_call["id"],
-                            "content": result
+                            "content": str(result)
                         })
                 else:
                     # No tool calls, this is the final response
