@@ -50,19 +50,19 @@ async def image_analyzer_tool(image_path: str, question: str = "Describe this im
         }.get(suffix, "image/jpeg")
         
         # Call GitHub Models API
-        token = os.getenv("GITHUB_TOKEN")
+        token = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or os.getenv("GITHUB_TOKEN")
         if not token:
             return json.dumps({"error": "GITHUB_TOKEN not set"})
             
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
-                "https://models.inference.ai.azure.com/chat/completions",
+                "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
                 headers={
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": "gpt-4o-mini",
+                    "model": "gemini-3.6-flash",
                     "messages": [
                         {
                             "role": "user",

@@ -49,7 +49,7 @@ class ChatRequest(BaseModel):
     message: str
     conversation_id: Optional[str] = None
     files: Optional[List[dict]] = None
-    model: Optional[str] = "gpt-4o-mini"
+    model: Optional[str] = "gemini-3.6-flash"
 
 
 class ChatResponse(BaseModel):

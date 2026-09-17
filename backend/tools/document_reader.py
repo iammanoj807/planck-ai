@@ -15,19 +15,19 @@ import fitz  # PyMuPDF
 async def _ocr_page(image_data: str) -> str:
     """Use GPT-4o to transcribe text from a base64 image."""
     try:
-        token = os.getenv("GITHUB_TOKEN")
+        token = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or os.getenv("GITHUB_TOKEN")
         if not token:
             return "" # Skip if no token
             
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
-                "https://models.inference.ai.azure.com/chat/completions",
+                "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
                 headers={
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": "gpt-4o-mini", # Use mini to avoid 4o rate limits
+                    "model": "gemini-3.6-flash", # Use mini to avoid 4o rate limits
                     "messages": [
                         {
                             "role": "system",

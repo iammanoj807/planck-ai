@@ -79,7 +79,7 @@ export default function ReasoningPanel({ toolCalls, model, language }) {
                     <div className="flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity select-none">
                         <Bot className="w-3.5 h-3.5 text-cyan-400" />
                         <span className={`text-[11px] font-medium tracking-wide ${model === 'gpt-4o' ? 'text-cyan-100' : 'text-zinc-400'}`}>
-                            {model === 'gpt-4o' ? 'GPT-4o' : 'GPT-4o Mini'}
+                            {model.includes('pro') ? 'Gemini 2.5 Pro' : 'Gemini 3.6 Flash'}
                             {language && (
                                 <span>
                                     <span className="mx-1.5 opacity-40">•</span>
