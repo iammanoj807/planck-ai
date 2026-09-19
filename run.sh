@@ -51,7 +51,7 @@ echo -e "${GREEN}✅ Starting React Frontend on http://localhost:5173${NC}"
 npm run dev &
 FRONTEND_PID=$!
 
-echo -e "${BLUE}🎉 AgentX is running!${NC}"
+echo -e "${BLUE}🎉 Planck AI is running!${NC}"
 echo -e "Frontend: http://localhost:5173"
 echo -e "Backend:  http://localhost:8000"
 echo -e "Press Ctrl+C to stop all services"
