@@ -169,13 +169,16 @@ export default function ChatInterface({
             const reader = response.body.getReader()
             const decoder = new TextDecoder()
             let currentConvId = conversationId
+            let buffer = '' // an SSE line can be split across network reads; keep the partial tail
 
             while (true) {
                 const { done, value } = await reader.read()
                 if (done) break
 
-                const text = decoder.decode(value)
-                const lines = text.split('\n').filter(line => line.startsWith('data: '))
+                buffer += decoder.decode(value, { stream: true })
+                const parts = buffer.split('\n')
+                buffer = parts.pop()
+                const lines = parts.filter(line => line.startsWith('data: '))
 
                 for (const line of lines) {
                     try {
@@ -223,15 +226,17 @@ export default function ChatInterface({
                             setToolCalls(prev => completeAllTools(prev))
                             accumulatedToolCalls = completeAllTools(accumulatedToolCalls)
 
-                            // Implement Typing Effect for aesthetic smoothness
+                            // Typing effect, capped at ~1s total. Revealing one character per timer
+                            // took 15s+ for long answers (browsers clamp timers to >=4ms) and
+                            // re-rendered the markdown thousands of times.
                             setStreamingMessage('')
                             const fullContent = data.content
-                            let currentText = ''
+                            const charsPerFrame = Math.max(20, Math.ceil(fullContent.length / 60))
                             setStreamingMessage(' ') // Initialize bubble
 
-                            const typeChar = (index) => {
-                                // If user switches tabs (document hidden), finish immediately
-                                if (document.hidden) {
+                            const reveal = (index) => {
+                                // Done, or user switched tabs (document hidden): show the full answer
+                                if (index >= fullContent.length || document.hidden) {
                                     setStreamingMessage('')
                                     onAddMessage({
                                         id: Date.now().toString(),
@@ -242,26 +247,10 @@ export default function ChatInterface({
                                     })
                                     return
                                 }
-
-                                if (index < fullContent.length) {
-                                    currentText += fullContent[index]
-                                    setStreamingMessage(currentText)
-                                    // Dynamic speed: Faster for longer blocks
-                                    const delay = fullContent.length > 500 ? 1 : 5
-                                    setTimeout(() => typeChar(index + 1), delay)
-                                } else {
-                                    // Done typing
-                                    setStreamingMessage('')
-                                    onAddMessage({
-                                        id: Date.now().toString(),
-                                        role: 'assistant',
-                                        content: fullContent,
-                                        toolCalls: accumulatedToolCalls,
-                                        language: currentLanguage
-                                    })
-                                }
+                                setStreamingMessage(fullContent.slice(0, index))
+                                setTimeout(() => reveal(index + charsPerFrame), 16)
                             }
-                            typeChar(0)
+                            reveal(charsPerFrame)
                         } else if (data.type === 'error') {
                             const errorMsg = data.content || 'An unknown error occurred.'
                             const rateLimitMatch = errorMsg.match(/Retrying allowed in:\s*(\d+\.?\d*)s/) || errorMsg.match(/Please wait (\d+\.?\d*)s/)

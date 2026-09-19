@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { User, Bot, AlertCircle, Image, FileText, Clock, Check, Copy, Terminal } from 'lucide-react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
@@ -177,6 +178,7 @@ export default function MessageBubble({ message }) {
                     ) : (
                         <div className={`markdown-content max-w-full overflow-hidden ${isError ? 'text-red-300' : 'text-slate-200'}`}>
                             <ReactMarkdown
+                                remarkPlugins={[remarkGfm]} // tables, strikethrough, task lists
                                 components={{
                                     code({ node, inline, className, children, ...props }) {
                                         const match = /language-(\w+)/.exec(className || '')
@@ -279,6 +281,14 @@ export default function MessageBubble({ message }) {
                                             <a href={href} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                                                 {children}
                                             </a>
+                                        )
+                                    },
+                                    table({ children }) {
+                                        // Wide tables scroll sideways instead of overflowing the bubble
+                                        return (
+                                            <div className="table-wrapper">
+                                                <table>{children}</table>
+                                            </div>
                                         )
                                     }
                                 }}

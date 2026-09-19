@@ -274,7 +274,7 @@ class AgentRunner:
 
                 # Show the model's native reasoning (gpt-oss returns it) as the thinking step
                 reasoning = message.get("reasoning") or message.get("reasoning_content")
-                if iteration == 1 and reasoning:
+                if iteration == 1 and isinstance(reasoning, str) and reasoning.strip():
                     yield StreamingChunk(
                         type="tool_call",
                         content="Using thinking...",
