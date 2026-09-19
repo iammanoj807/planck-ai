@@ -7,12 +7,12 @@ import HeroSection from './HeroSection'
 
 const FOCUS_MODES = [
     { id: 'web', label: 'Web Search', icon: Compass, description: 'Connects to the internet to find real-time information, news, and citations for your queries.' },
-    { id: 'chat', label: 'Chat Only', icon: MessageSquareText, description: 'Uses purely the model\'s internal knowledge base for faster reasoning, coding, and creative writing without external search.' },
+    { id: 'chat', label: 'Chat Only', icon: MessageSquareText, description: 'Uses purely the model\'s internal knowledge base for faster reasoning, coding, and creative writing without external search.' }
 ]
 
 /**
  * Chat Interface Component
- * 
+ *
  * The core chat view. Handles:
  * 1. Rendering the message list (MessageBubble).
  * 2. Managing the input area and file uploads.
@@ -24,8 +24,6 @@ export default function ChatInterface({
     messages,
     onAddMessage,
     onConversationUpdate,
-    selectedModel, // New prop: 'gpt-4o' | 'gpt-4o-mini'
-    onSelectModel,
     currentLanguage = 'English'
 }) {
     const [input, setInput] = useState('')
@@ -34,9 +32,41 @@ export default function ChatInterface({
     const [uploadedFiles, setUploadedFiles] = useState([])
     const [streamingMessage, setStreamingMessage] = useState('')
 
+    // Upload each file to backend/uploads; the agent's tools read files from the returned path
+    const handleFileUpload = async (e) => {
+        const files = Array.from(e.target.files)
+        e.target.value = '' // allow re-selecting the same file
+
+        const uploads = files.map(async file => {
+            const formData = new FormData()
+            formData.append('file', file)
+
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            if (!response.ok) throw new Error(`Upload failed for ${file.name}: ${response.status}`)
+            const data = await response.json() // { original_name, path, type: 'image' | 'pdf' | 'file' }
+
+            return {
+                ...data,
+                preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
+            }
+        })
+
+        const results = await Promise.allSettled(uploads)
+        results
+            .filter(result => result.status === 'rejected')
+            .forEach(result => console.error('Upload failed:', result.reason))
+
+        const uploaded = results
+            .filter(result => result.status === 'fulfilled')
+            .map(result => result.value)
+        setUploadedFiles(prev => [...prev, ...uploaded])
+    }
+
     const [focusMode, setFocusMode] = useState('web')
     const [showFocusMenu, setShowFocusMenu] = useState(false)
-    const [showModelMenu, setShowModelMenu] = useState(false)
     const [showScrollButton, setShowScrollButton] = useState(false)
 
     const messagesEndRef = useRef(null)
@@ -68,39 +98,13 @@ export default function ChatInterface({
         }
     }, [messages, streamingMessage, toolCalls])
 
-
-
-    // Handle file upload to backend/uploads
-    const handleFileUpload = async (event) => {
-        const file = event.target.files[0]
-        if (!file) return
-
-        const formData = new FormData()
-        formData.append('file', file)
-
-        try {
-            const response = await fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-            const data = await response.json()
-
-            setUploadedFiles(prev => [...prev, {
-                ...data,
-                preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
-            }])
-        } catch (error) {
-            console.error('Upload failed:', error)
-        }
-    }
-
     const removeFile = (index) => {
         setUploadedFiles(prev => prev.filter((_, i) => i !== index))
     }
 
     /**
      * Handle Message Submission
-     * 
+     *
      * 1. Constructs the user message object.
      * 2. Sends POST request to /chat.
      * 3. Opens a ReadableStream to process Server-Sent Events (SSE).
@@ -152,7 +156,8 @@ export default function ChatInterface({
                 body: JSON.stringify({
                     message: finalMessage,
                     conversation_id: conversationId,
-                    model: selectedModel,
+                    // Default model - backend handles provider selection with fallback
+                    model: 'openai/gpt-oss-120b',
                     files: uploadedFiles.map(f => ({
                         name: f.original_name,
                         path: f.path,
@@ -233,7 +238,6 @@ export default function ChatInterface({
                                         role: 'assistant',
                                         content: fullContent,
                                         toolCalls: accumulatedToolCalls,
-                                        model: selectedModel,
                                         language: currentLanguage
                                     })
                                     return
@@ -253,7 +257,6 @@ export default function ChatInterface({
                                         role: 'assistant',
                                         content: fullContent,
                                         toolCalls: accumulatedToolCalls,
-                                        model: selectedModel,
                                         language: currentLanguage
                                     })
                                 }
@@ -272,7 +275,7 @@ export default function ChatInterface({
                                     content: `Rate Limit Hit. Please wait ${waitTimeCurrent}s.`,
                                     isRateLimit: true,
                                     retryAfter: waitTimeCurrent,
-                                    model: selectedModel
+                                    model: 'openai/gpt-oss-120b'
                                 })
                             } else if (errorMsg.includes('tokens_limit_reached') || errorMsg.includes('413')) {
                                 onAddMessage({
@@ -329,10 +332,8 @@ export default function ChatInterface({
             focusMode={focusMode}
             setFocusMode={setFocusMode}
             FOCUS_MODES={FOCUS_MODES}
-            selectedModel={selectedModel}
-            onSelectModel={onSelectModel}
-            showModelMenu={showModelMenu}
-            setShowModelMenu={setShowModelMenu}
+            showModelMenu={false} // Model selector removed
+            setShowModelMenu={() => {}} // No-op function
         />
     )
 
