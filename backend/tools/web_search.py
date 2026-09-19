@@ -16,7 +16,9 @@ async def web_search_tool(query: str, max_results: int = 5) -> str:
     Returns:
         Formatted search results
     """
-    
+    # Models sometimes ask for 10+ results; every extra result is re-sent on each later LLM call
+    max_results = min(int(max_results), 5)
+
     # 1. Try Google Search
     google_api_key = os.getenv("GOOGLE_API_KEY")
     google_cse_id = os.getenv("GOOGLE_CSE_ID")

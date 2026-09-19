@@ -4,7 +4,7 @@ load_dotenv()
 import os
 import json
 import asyncio
-from typing import Dict, Any, AsyncGenerator, Literal
+from typing import Dict, Any, AsyncGenerator, Literal, Optional, List
 from datetime import datetime
 
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
@@ -12,17 +12,19 @@ import httpx
 
 from .state import AgentState, StreamingChunk
 from .prompts import SYSTEM_PROMPT
+from .providers import LLMProvider, RateLimitError, create_provider, get_available_providers
 from tools.web_search import web_search_tool, WEB_SEARCH_TOOL_DEF
 from tools.code_executor import code_executor_tool, CODE_EXECUTOR_TOOL_DEF
 from tools.image_analyzer import image_analyzer_tool, IMAGE_ANALYZER_TOOL_DEF
 from tools.document_reader import document_reader_tool, DOCUMENT_READER_TOOL_DEF
-from tools.thinking import thinking_tool, THINKING_TOOL_DEF
+from tools.thinking import thinking_tool
 
 
 # Tool definitions for the model
 
 # Tools allowed in Web Search Mode
-# NOTE: thinking tool removed - Gemini reasons internally, saves rate limit quota
+# NOTE: thinking tool removed - it cost a full extra LLM round trip per question.
+# The models reason natively; that reasoning is surfaced as the "thinking" step instead.
 TOOLS = [
     WEB_SEARCH_TOOL_DEF,
     CODE_EXECUTOR_TOOL_DEF,
@@ -41,116 +43,75 @@ CHAT_TOOLS = [
 class AgentRunner:
     """
     Runs the agent loop with tool execution and streaming.
-    
+
     This class manages:
     1. Communication with the LLM API (Azure OpenAI / GitHub Models).
     2. Dynamic context window resizing based on model selection.
     3. Tool execution processing.
     4. Streaming responses back to the caller in chunks.
     """
-    
+
     def __init__(self):
-        self.token = os.getenv("GROQ_API_KEY")
-        self.model = "openai/gpt-oss-120b"
-        self.api_url = "https://api.groq.com/openai/v1/chat/completions"
-        
-    async def _call_llm(
+        # Providers in priority order: Groq first, then Gemini and NVIDIA as fallbacks.
+        # Each is enabled by its <NAME>_API_KEY; <NAME>_MODEL optionally overrides the default model.
+        self.providers: List[LLMProvider] = []
+        self.provider_names: List[str] = []
+
+        for name in get_available_providers():
+            api_key = os.getenv(f"{name.upper()}_API_KEY")
+            if not api_key:
+                continue
+            provider = create_provider(name, api_key, model=os.getenv(f"{name.upper()}_MODEL"))
+            self.providers.append(provider)
+            self.provider_names.append(name)
+            print(f"DEBUG: Initialized {name} provider ({provider.model})")
+
+        if not self.providers:
+            raise Exception("No LLM providers configured. Please set at least one of: GROQ_API_KEY, GEMINI_API_KEY, NVIDIA_API_KEY")
+
+    async def _call_llm_with_fallback(
         self,
-        messages: list,
-        tools: list = None,
-        stream: bool = False
+        messages: List[Dict[str, Any]],
+        tools: List[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
-        Call the LLM API.
-        
-        Supports both streaming and non-streaming requests.
-        Handles API authentication, payload construction, and rate limit errors (429).
+        Call providers in priority order, moving on to the next one immediately when one fails.
+
+        Every call starts from the primary provider. If all of them fail we make one more pass,
+        pausing first only when every provider was rate limited (capped so the user isn't
+        left waiting for long).
         """
-        headers = {
-            "Authorization": f"Bearer {self.token}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "model": self.model,
-            "messages": messages,
-            # Keep max_tokens low to stay within Groq's 8000 TPM free-tier limit.
-            # Tool-calling steps rarely need more than 500 tokens; final answers get 1500.
-            "max_tokens": 1500,
-            "temperature": 0.7,
-        }
-        
-        if tools:
-            payload["tools"] = [{"type": "function", "function": t} for t in tools]
-            payload["tool_choice"] = "auto"
-            
-        if stream:
-            payload["stream"] = True
-            
-        # Exponential backoff retry for rate limits (Gemini free tier: 15 RPM)
-        max_retries = 5
-        base_wait = 10  # seconds
-        
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            for attempt in range(max_retries):
-                if stream:
-                    async with client.stream("POST", self.api_url, headers=headers, json=payload) as response:
-                        if response.status_code == 429:
-                            retry_after = response.headers.get("Retry-After")
-                            wait_time = int(retry_after) if retry_after else (base_wait * (2 ** attempt))
-                            print(f"DEBUG: Rate limited (stream). Waiting {wait_time}s before retry {attempt+1}/{max_retries}")
-                            await asyncio.sleep(wait_time)
-                            continue
-                        async for line in response.aiter_lines():
-                            if line.startswith("data: "):
-                                data = line[6:]
-                                if data == "[DONE]":
-                                    break
-                                try:
-                                    yield json.loads(data)
-                                except json.JSONDecodeError:
-                                    continue
-                    return  # stream done
-                else:
-                    response = await client.post(self.api_url, headers=headers, json=payload)
-                    
-                    # Check for rate limit headers
-                    self._update_rate_limits(response.headers)
-                    
-                    if response.status_code == 429:
-                        retry_after = response.headers.get("Retry-After")
-                        reset_time = response.headers.get("x-ratelimit-reset-requests")
-                        
-                        wait_time = base_wait * (2 ** attempt)
-                        if retry_after:
-                            try:
-                                wait_time = int(retry_after)
-                            except (ValueError, TypeError):
-                                pass
-                        elif reset_time:
-                            try:
-                                wait_time = float(reset_time)
-                            except (ValueError, TypeError):
-                                pass
-                        
-                        print(f"DEBUG: Rate limited. Waiting {wait_time}s before retry {attempt+1}/{max_retries}")
-                        await asyncio.sleep(wait_time)
-                        continue
-                        
-                    if response.status_code != 200:
-                        raise Exception(f"API error: {response.status_code} - {response.text}")
-                    yield response.json()
-                    return  # success
-            
-            # All retries exhausted
-            raise Exception("API Rate Limit: Max retries exceeded. Please wait a minute and try again.")
+        last_error = None
+        for attempt in range(2):
+            retry_waits = []
+            for provider, name in zip(self.providers, self.provider_names):
+                try:
+                    print(f"DEBUG: Attempting LLM call with {name} provider")
+                    return await provider.generate(messages, tools=tools)
+                except RateLimitError as e:
+                    print(f"INFO: {name} hit rate limit, trying next provider...")
+                    retry_waits.append(e.retry_after or 5)
+                    last_error = e
+                except Exception as e:
+                    print(f"WARNING: {name} provider failed: {e}")
+                    last_error = e
+
+            all_rate_limited = len(retry_waits) == len(self.providers)
+            if attempt == 0 and all_rate_limited:
+                wait_time = min(min(retry_waits), 15)
+                print(f"INFO: All providers rate limited, waiting {wait_time:.0f}s before retrying")
+                await asyncio.sleep(wait_time)
+
+        if all_rate_limited:
+            raise Exception(f"All AI providers are rate limited. Please wait {min(retry_waits):.0f}s and try again.")
+        raise Exception(f"All LLM providers failed. Last error: {last_error}")
 
     def _update_rate_limits(self, headers: Dict[str, str]):
         """Update cached rate limits from headers."""
         # Simple extraction for logging/debugging if needed
         # We focus on the 429 handling above for now
         pass
-                
+
     async def _execute_tool(self, tool_name: str, tool_input: Dict[str, Any]) -> str:
         """
         Execute a tool by name and return the string result.
@@ -168,7 +129,7 @@ class AgentRunner:
             return thinking_tool(**tool_input)
         else:
             return json.dumps({"error": f"Unknown tool: {tool_name}"})
-            
+
     async def run(
         self,
         user_message: str,
@@ -180,24 +141,24 @@ class AgentRunner:
     ) -> AsyncGenerator[StreamingChunk, None]:
         """
         Run the agent loop (Thinking -> Tool Use -> Final Response).
-        
+
         Args:
             user_message: The current query from the user.
             conversation_history: List of previous messages for context.
             files: List of uploaded files (images, PDFs) to process.
             model_name: The backend model to use ('gpt-4o' or 'gpt-4o-mini').
             mode: 'web' (default) or 'chat' (no tools).
-            
+
         Yields:
             StreamingChunk objects representing partial updates (thinking, tool usage, tokens).
         """
-        
+
         # Set model for this run — using Groq-hosted models with tool calling support
         if model_name in ["gpt-4o-mini", "mini", "gemini-3.6-flash", "openai/gpt-oss-20b"]:
             self.model = "openai/gpt-oss-20b"
         else:
             self.model = "openai/gpt-oss-120b"
-        
+
 
         # Select prompt and tools based on mode
         if mode == "chat":
@@ -207,44 +168,44 @@ class AgentRunner:
         else:
             system_prompt = SYSTEM_PROMPT
             active_tools = TOOLS
-        
+
         # Build messages
         formatted_system_prompt = system_prompt.format(
             current_date=datetime.now().strftime("%A, %B %d, %Y")
         )
-        
+
         # Append Language Instruction
         if language and language != "English":
             formatted_system_prompt += f"\n\nIMPORTANT: You must respond in {language}. Translate your internal reasoning if necessary, but the final output must be in {language}."
             print(f"DEBUG: Injected Language Instruction for '{language}'")
-        
+
         messages = [{"role": "system", "content": formatted_system_prompt}]
-        
+
         # Smart Context Management
         # Dynamic limit based on model capacity
         # Github Models Free Tier has a strict 8k token limit for ALL models
         # 8k tokens ~= 32k chars. We use 30k to be safe.
         MAX_HISTORY_CHARS = 8000  # Keep context small to stay within 8000 TPM
-            
+
         current_chars = 0
         selected_history = []
-        
+
         if conversation_history:
             # Iterate backwards to keep most recent first
             for msg in reversed(conversation_history):
                 content = msg.get("content") or ""
-                
+
                 # Truncate extremely long individual text messages
                 if content and len(content) > 2000:
                     content = content[:2000] + "... [truncated]"
-                
+
                 # Estimate size (including tool call overhead)
                 msg_len = len(content) + 200 # Buffer for metadata
-                
+
                 if current_chars + msg_len > MAX_HISTORY_CHARS:
                     # Soft limit hit - stop adding history
                     break
-                
+
                 # Reconstruct message preserving CRITICAL fields for API validity
                 clean_msg = {
                     "role": msg["role"],
@@ -268,7 +229,7 @@ class AgentRunner:
 
         # Add trimmed history to messages
         messages.extend(selected_history)
-                
+
         # Add file context if any
         file_context = ""
         if files:
@@ -277,58 +238,75 @@ class AgentRunner:
                     file_context += f"\n[Image uploaded: {f.get('name', 'image')}]"
                 elif f.get("type") == "pdf":
                     file_context += f"\n[PDF uploaded: {f.get('name', 'document.pdf')} (Path: {f.get('path')})]"
-                    
+
         # Add user message
         full_message = user_message
         if file_context:
             full_message = f"{file_context}\n\n{user_message}"
-            
+
         # Reinforce language instruction in the user message itself (for stronger adherence)
         if language and language != "English":
             full_message += f"\n\n(IMPORTANT: Please provide your final response in {language}. Ignore the language of search results.)"
 
         messages.append({"role": "user", "content": full_message})
-        
-        # Yield thinking start
-        yield StreamingChunk(
-            type="thinking",
-            content="Analyzing your request...",
-            metadata={"step": "start"}
-        )
-        
-        max_iterations = 15
+
+        # No upfront "thinking" chunk: the frontend shows its own placeholder while loading,
+        # and the model's real reasoning is emitted as the thinking step below (one row, not two)
+
+        max_iterations = 8
         iteration = 0
-        
+
         try:
             while iteration < max_iterations:
                 iteration += 1
-                
+
+                # On the last step, withhold tools so the model answers with what it has
+                # instead of searching forever and ending with no answer
+                final_step = iteration == max_iterations
+                if final_step:
+                    messages.append({"role": "user", "content": "(Step limit reached. Answer now using only the information above.)"})
+
                 # Call LLM
-                response = None
-                async for chunk in self._call_llm(messages, tools=active_tools, stream=False):
-                    response = chunk
-                    break
-                    
-                if not response:
-                    yield StreamingChunk(type="error", content="Failed to get LLM response", metadata=None)
-                    return
-                    
+                response = await self._call_llm_with_fallback(messages, tools=None if final_step else active_tools)
+
                 choice = response["choices"][0]
                 message = choice["message"]
-                
+
+                # Show the model's native reasoning (gpt-oss returns it) as the thinking step
+                reasoning = message.get("reasoning") or message.get("reasoning_content")
+                if iteration == 1 and reasoning:
+                    yield StreamingChunk(
+                        type="tool_call",
+                        content="Using thinking...",
+                        metadata={"tool": "thinking", "input": {"thought": reasoning}}
+                    )
+                    yield StreamingChunk(
+                        type="tool_result",
+                        content="Thought logged.",
+                        metadata={"tool": "thinking", "duration_ms": 0, "full_result": "Thought logged."}
+                    )
+
                 # Check for tool calls
-                tool_calls = message.get("tool_calls", [])
-                
+                tool_calls = message.get("tool_calls") or []
+
                 if tool_calls:
-                    # Append full assistant message preserving thought_signature & all tool_calls
-                    messages.append(dict(message))
-                    
+                    # Keep only fields every provider accepts (plus Gemini's thought_signature in
+                    # extra_content) so a fallback provider can pick up this conversation mid-run
+                    messages.append({
+                        "role": "assistant",
+                        "content": message.get("content"),
+                        "tool_calls": [
+                            {key: value for key, value in tool_call.items() if key in ("id", "type", "function", "extra_content")}
+                            for tool_call in tool_calls
+                        ]
+                    })
+
                     # Process each tool call
                     for tool_call in tool_calls:
                         func = tool_call["function"]
                         tool_name = func["name"]
                         tool_input = json.loads(func["arguments"])
-                        
+
                         # Yield tool call info
                         yield StreamingChunk(
                             type="tool_call",
@@ -338,12 +316,12 @@ class AgentRunner:
                                 "input": tool_input
                             }
                         )
-                        
+
                         # Execute tool
                         start_time = datetime.now()
                         result = await self._execute_tool(tool_name, tool_input)
                         duration = (datetime.now() - start_time).total_seconds() * 1000
-                        
+
                         # Yield tool result
                         yield StreamingChunk(
                             type="tool_result",
@@ -354,7 +332,7 @@ class AgentRunner:
                                 "full_result": result
                             }
                         )
-                        
+
                         # Add tool result message
                         messages.append({
                             "role": "tool",
@@ -364,21 +342,21 @@ class AgentRunner:
                 else:
                     # No tool calls, this is the final response
                     content = message.get("content", "")
-                    
+
                     yield StreamingChunk(
                         type="response",
                         content=content,
                         metadata={"finish_reason": choice.get("finish_reason")}
                     )
                     return
-                    
+
             # Max iterations reached
             yield StreamingChunk(
                 type="response",
                 content="I've reached the maximum number of steps. Here's what I found so far based on my analysis.",
                 metadata={"max_iterations_reached": True}
             )
-            
+
         except Exception as e:
             # Catch rate limit and other errors, yield as error chunk
             yield StreamingChunk(

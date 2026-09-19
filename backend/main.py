@@ -77,8 +77,8 @@ async def chat(request: ChatRequest):
     """Send a message to the agent and get a streaming response."""
     
     # Check for API token
-    if not os.getenv("GITHUB_TOKEN"):
-        raise HTTPException(status_code=500, detail="GITHUB_TOKEN not configured")
+    if not any(os.getenv(key) for key in ("GROQ_API_KEY", "GEMINI_API_KEY", "NVIDIA_API_KEY")):
+        raise HTTPException(status_code=500, detail="No LLM API key configured (GROQ_API_KEY, GEMINI_API_KEY or NVIDIA_API_KEY)")
     
     # Get or create conversation
     conversation_id = request.conversation_id
