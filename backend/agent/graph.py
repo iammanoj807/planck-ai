@@ -58,7 +58,9 @@ class AgentRunner:
         self.provider_names: List[str] = []
 
         for name in get_available_providers():
-            api_key = os.getenv(f"{name.upper()}_API_KEY")
+            # Hosting secrets (e.g. Hugging Face) are used verbatim, unlike .env files: strip the
+            # stray newline/space/quotes a paste can add, which httpx rejects as an illegal header
+            api_key = (os.getenv(f"{name.upper()}_API_KEY") or "").strip().strip("\"'").strip()
             if not api_key:
                 continue
             provider = create_provider(name, api_key, model=os.getenv(f"{name.upper()}_MODEL"))
@@ -81,9 +83,9 @@ class AgentRunner:
         pausing first only when every provider was rate limited (capped so the user isn't
         left waiting for long).
         """
-        last_error = None
         for attempt in range(2):
             retry_waits = []
+            errors = []
             for provider, name in zip(self.providers, self.provider_names):
                 try:
                     print(f"DEBUG: Attempting LLM call with {name} provider")
@@ -91,10 +93,10 @@ class AgentRunner:
                 except RateLimitError as e:
                     print(f"INFO: {name} hit rate limit, trying next provider...")
                     retry_waits.append(e.retry_after or 5)
-                    last_error = e
+                    errors.append(f"{name}: rate limited")
                 except Exception as e:
                     print(f"WARNING: {name} provider failed: {e}")
-                    last_error = e
+                    errors.append(str(e)[:200])
 
             all_rate_limited = len(retry_waits) == len(self.providers)
             if attempt == 0 and all_rate_limited:
@@ -104,7 +106,7 @@ class AgentRunner:
 
         if all_rate_limited:
             raise Exception(f"All AI providers are rate limited. Please wait {min(retry_waits):.0f}s and try again.")
-        raise Exception(f"All LLM providers failed. Last error: {last_error}")
+        raise Exception("All LLM providers failed. " + " | ".join(errors))
 
     def _update_rate_limits(self, headers: Dict[str, str]):
         """Update cached rate limits from headers."""

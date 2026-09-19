@@ -14,8 +14,9 @@ async def execute_google_search(query: str, count: int = 5) -> str:
     
     Returns formatted search results with titles, snippets, and URLs.
     """
-    api_key = os.getenv("GOOGLE_API_KEY")
-    cse_id = os.getenv("GOOGLE_CSE_ID")
+    # Strip stray whitespace/quotes that pasted hosting secrets can carry
+    api_key = (os.getenv("GOOGLE_API_KEY") or "").strip().strip("\"'").strip()
+    cse_id = (os.getenv("GOOGLE_CSE_ID") or "").strip().strip("\"'").strip()
     
     if not api_key or not cse_id:
         print("DEBUG: Missing GOOGLE_API_KEY or GOOGLE_CSE_ID")

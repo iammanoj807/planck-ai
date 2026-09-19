@@ -57,8 +57,13 @@ class LLMProvider:
             "Content-Type": "application/json"
         }
 
-        async with httpx.AsyncClient(timeout=httpx.Timeout(45.0, connect=10.0)) as client:
-            response = await client.post(self.api_url, headers=headers, json=payload)
+        try:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(45.0, connect=10.0)) as client:
+                response = await client.post(self.api_url, headers=headers, json=payload)
+        except httpx.HTTPError as e:
+            # Report only the error type: some httpx errors echo the request headers,
+            # which would put the API key in logs and in the error shown to users
+            raise Exception(f"{self.provider_name} request failed ({type(e).__name__})") from None
 
         if response.status_code == 429:
             raise RateLimitError(
