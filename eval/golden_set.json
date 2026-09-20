@@ -1,0 +1,345 @@
+[
+  {
+    "id": "code_01",
+    "category": "code",
+    "question": "What is the 30th Fibonacci number? F(1)=1, F(2)=1.",
+    "expected_tool": "code_executor",
+    "answer_check": {
+      "kind": "exact",
+      "target": "832040"
+    },
+    "note": ""
+  },
+  {
+    "id": "code_02",
+    "category": "code",
+    "question": "How many prime numbers are there below 10000?",
+    "expected_tool": "code_executor",
+    "answer_check": {
+      "kind": "exact",
+      "target": "1229"
+    },
+    "note": ""
+  },
+  {
+    "id": "code_03",
+    "category": "code",
+    "question": "What is 2 to the power of 64, written out in full?",
+    "expected_tool": "code_executor",
+    "answer_check": {
+      "kind": "exact",
+      "target": "18446744073709551616"
+    },
+    "note": ""
+  },
+  {
+    "id": "code_04",
+    "category": "code",
+    "question": "What is the sum of all integers from 1 to 1000 inclusive?",
+    "expected_tool": "code_executor",
+    "answer_check": {
+      "kind": "exact",
+      "target": "500500"
+    },
+    "note": ""
+  },
+  {
+    "id": "code_05",
+    "category": "code",
+    "question": "How many trailing zeros does 100 factorial have?",
+    "expected_tool": "code_executor",
+    "answer_check": {
+      "kind": "exact",
+      "target": "24"
+    },
+    "note": ""
+  },
+  {
+    "id": "code_06",
+    "category": "code",
+    "question": "What is the greatest common divisor of 462 and 1071?",
+    "expected_tool": "code_executor",
+    "answer_check": {
+      "kind": "exact",
+      "target": "21"
+    },
+    "note": ""
+  },
+  {
+    "id": "code_07",
+    "category": "code",
+    "question": "Sort these numbers and give the median: 17, 3, 99, 42, 8, 71, 25.",
+    "expected_tool": "code_executor",
+    "answer_check": {
+      "kind": "exact",
+      "target": "25"
+    },
+    "note": ""
+  },
+  {
+    "id": "code_08",
+    "category": "code",
+    "question": "How many distinct anagrams does the word MISSISSIPPI have?",
+    "expected_tool": "code_executor",
+    "answer_check": {
+      "kind": "exact",
+      "target": "34650"
+    },
+    "note": ""
+  },
+  {
+    "id": "web_01",
+    "category": "web",
+    "question": "Who won the 2022 FIFA World Cup final, and what was the score?",
+    "expected_tool": "web_search",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "argentina"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "web_02",
+    "category": "web",
+    "question": "What is the current population of Birmingham, UK?",
+    "expected_tool": "web_search",
+    "answer_check": null,
+    "note": "no stable target; tool-selection only"
+  },
+  {
+    "id": "web_03",
+    "category": "web",
+    "question": "Who is the current CEO of NVIDIA?",
+    "expected_tool": "web_search",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "huang"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "web_04",
+    "category": "web",
+    "question": "What is the capital city of Kazakhstan and what was it called before 2019?",
+    "expected_tool": "web_search",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "astana"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "web_05",
+    "category": "web",
+    "question": "Which company acquired GitHub, and in what year?",
+    "expected_tool": "web_search",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "microsoft",
+        "2018"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "web_06",
+    "category": "web",
+    "question": "What is the latest stable version of Python?",
+    "expected_tool": "web_search",
+    "answer_check": null,
+    "note": "changes over time; tool-selection only"
+  },
+  {
+    "id": "web_07",
+    "category": "web",
+    "question": "Who wrote the paper 'Attention Is All You Need' and in what year was it published?",
+    "expected_tool": "web_search",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "2017"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "web_08",
+    "category": "web",
+    "question": "What is the tallest building in the world and how tall is it?",
+    "expected_tool": "web_search",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "burj khalifa"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "ms_01",
+    "category": "multi_step",
+    "question": "Find the year the Eiffel Tower was completed, then calculate how many days have passed since 1 January of that year until 1 January 2026.",
+    "expected_tool": "code_executor",
+    "answer_check": null,
+    "note": "search then compute"
+  },
+  {
+    "id": "ms_02",
+    "category": "multi_step",
+    "question": "What is the population of Tokyo, and what is that number divided by the population of Birmingham UK?",
+    "expected_tool": "code_executor",
+    "answer_check": null,
+    "note": "two searches then compute"
+  },
+  {
+    "id": "ms_03",
+    "category": "multi_step",
+    "question": "Find the boiling point of water in Celsius at sea level, convert it to Fahrenheit, and tell me both.",
+    "expected_tool": "code_executor",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "212"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "ms_04",
+    "category": "multi_step",
+    "question": "How many seconds are there in the number of days in a leap year? Show the calculation.",
+    "expected_tool": "code_executor",
+    "answer_check": {
+      "kind": "exact",
+      "target": "31622400"
+    },
+    "note": ""
+  },
+  {
+    "id": "ms_05",
+    "category": "multi_step",
+    "question": "Find the release year of the first iPhone, then compute how many years ago that was from 2026.",
+    "expected_tool": "code_executor",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "2007"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "ms_06",
+    "category": "multi_step",
+    "question": "What is the square root of the number of countries in the United Nations, to two decimal places?",
+    "expected_tool": "code_executor",
+    "answer_check": null,
+    "note": "search then compute"
+  },
+  {
+    "id": "ms_07",
+    "category": "multi_step",
+    "question": "Find the speed of light in metres per second, then calculate how far light travels in one hour.",
+    "expected_tool": "code_executor",
+    "answer_check": null,
+    "note": "search then compute"
+  },
+  {
+    "id": "doc_01",
+    "category": "document",
+    "question": "Read https://arxiv.org/abs/1706.03762 and tell me the title of the paper.",
+    "expected_tool": "document_reader",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "attention"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "doc_02",
+    "category": "document",
+    "question": "Read https://arxiv.org/abs/1706.03762 and list the authors.",
+    "expected_tool": "document_reader",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "vaswani"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "doc_03",
+    "category": "document",
+    "question": "Read https://arxiv.org/abs/1706.03762 and summarise the abstract in two sentences.",
+    "expected_tool": "document_reader",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "transformer"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "doc_04",
+    "category": "document",
+    "question": "Read https://arxiv.org/abs/2010.11929 and tell me what the paper proposes.",
+    "expected_tool": "document_reader",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "image"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "doc_05",
+    "category": "document",
+    "question": "Read https://en.wikipedia.org/wiki/ONNX and explain what ONNX is used for.",
+    "expected_tool": "document_reader",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "open neural network exchange"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "doc_06",
+    "category": "document",
+    "question": "Read https://arxiv.org/abs/1512.03385 and tell me the main contribution.",
+    "expected_tool": "document_reader",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "residual"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "doc_07",
+    "category": "document",
+    "question": "Read https://en.wikipedia.org/wiki/WebGPU and tell me what it replaces.",
+    "expected_tool": "document_reader",
+    "answer_check": {
+      "kind": "all_of",
+      "target": [
+        "webgl"
+      ]
+    },
+    "note": ""
+  }
+]
