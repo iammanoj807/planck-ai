@@ -1,0 +1,213 @@
+[
+  {
+    "file": "eval/results/baseline.jsonl",
+    "n_total": 30,
+    "n_excluded_rate_limited": 0,
+    "n_scored": 30,
+    "tool_selection_correct": 24,
+    "tool_selection_pct": 80.0,
+    "task_success_correct": 24,
+    "task_success_n": 24,
+    "task_success_pct": 100.0,
+    "task_success_sound_correct": 20,
+    "task_success_sound_n": 20,
+    "task_success_sound_pct": 100.0,
+    "unsound_targets": [
+      "code_07",
+      "doc_04",
+      "doc_05",
+      "doc_06"
+    ],
+    "completed": 30,
+    "completed_pct": 100.0,
+    "median_latency_s": 2.67,
+    "p90_latency_s": 6.11,
+    "errors": [],
+    "by_category": {
+      "code": {
+        "n": 8,
+        "tool_ok": 4,
+        "chk": 8,
+        "chk_ok": 8
+      },
+      "web": {
+        "n": 8,
+        "tool_ok": 8,
+        "chk": 6,
+        "chk_ok": 6
+      },
+      "multi_step": {
+        "n": 7,
+        "tool_ok": 5,
+        "chk": 3,
+        "chk_ok": 3
+      },
+      "document": {
+        "n": 7,
+        "tool_ok": 7,
+        "chk": 7,
+        "chk_ok": 7
+      }
+    },
+    "failures": [
+      {
+        "id": "code_04",
+        "expected": "code_executor",
+        "called": [
+          "thinking"
+        ],
+        "answer_ok": true,
+        "answer": "**Solution**\n\nThe sum of the first\u202f\\(n\\)\u202fpositive integers is given by the formula  \n\n\\[\nS = \\frac{n(n+1)}{2}.\n\\]\n\nHere "
+      },
+      {
+        "id": "code_05",
+        "expected": "code_executor",
+        "called": [
+          "thinking"
+        ],
+        "answer_ok": true,
+        "answer": "**Answer: 24 trailing zeros**\n\n### Why?\n\nThe number of trailing zeros in a factorial comes from the number of times the "
+      },
+      {
+        "id": "code_06",
+        "expected": "code_executor",
+        "called": [
+          "thinking"
+        ],
+        "answer_ok": true,
+        "answer": "**Answer:** The greatest common divisor (GCD) of 462 and 1071 is **21**.\n\n**How we get it (Euclidean algorithm):**\n\n1. \\"
+      },
+      {
+        "id": "code_07",
+        "expected": "code_executor",
+        "called": [
+          "thinking"
+        ],
+        "answer_ok": true,
+        "answer": "**Sorted list:**  \n3,\u202f8,\u202f17,\u202f25,\u202f42,\u202f71,\u202f99  \n\n**Median:**\u202f**25** (the middle value of the 7\u2011element ordered set)"
+      },
+      {
+        "id": "ms_03",
+        "expected": "code_executor",
+        "called": [
+          "thinking",
+          "web_search"
+        ],
+        "answer_ok": true,
+        "answer": "The boiling point of water at sea level is:\n\n* **Celsius:** 100\u00b0C\n* **Fahrenheit:** 212\u00b0F\n\n**Source:** [Pew Research Cen"
+      },
+      {
+        "id": "ms_05",
+        "expected": "code_executor",
+        "called": [
+          "thinking",
+          "web_search"
+        ],
+        "answer_ok": true,
+        "answer": "**Release year of the first iPhone:** **2007**  \n- The original iPhone was announced on January\u202f9\u202f2007 and released in t"
+      }
+    ]
+  },
+  {
+    "file": "eval/results/faulted.jsonl",
+    "n_total": 30,
+    "n_excluded_rate_limited": 0,
+    "n_scored": 30,
+    "tool_selection_correct": 23,
+    "tool_selection_pct": 76.7,
+    "task_success_correct": 24,
+    "task_success_n": 24,
+    "task_success_pct": 100.0,
+    "task_success_sound_correct": 20,
+    "task_success_sound_n": 20,
+    "task_success_sound_pct": 100.0,
+    "unsound_targets": [
+      "code_07",
+      "doc_04",
+      "doc_05",
+      "doc_06"
+    ],
+    "completed": 30,
+    "completed_pct": 100.0,
+    "median_latency_s": 2.16,
+    "p90_latency_s": 21.77,
+    "errors": [],
+    "by_category": {
+      "code": {
+        "n": 8,
+        "tool_ok": 3,
+        "chk": 8,
+        "chk_ok": 8
+      },
+      "web": {
+        "n": 8,
+        "tool_ok": 8,
+        "chk": 6,
+        "chk_ok": 6
+      },
+      "multi_step": {
+        "n": 7,
+        "tool_ok": 5,
+        "chk": 3,
+        "chk_ok": 3
+      },
+      "document": {
+        "n": 7,
+        "tool_ok": 7,
+        "chk": 7,
+        "chk_ok": 7
+      }
+    },
+    "failures": [
+      {
+        "id": "code_04",
+        "expected": "code_executor",
+        "called": [],
+        "answer_ok": true,
+        "answer": "To find the sum of all integers from 1 to 1000 inclusive, we can use the formula for the sum of an arithmetic sequence ("
+      },
+      {
+        "id": "code_05",
+        "expected": "code_executor",
+        "called": [],
+        "answer_ok": true,
+        "answer": "To find the number of trailing zeros in $100!$ (100 factorial), we need to count how many times the prime factor 10 is a"
+      },
+      {
+        "id": "code_06",
+        "expected": "code_executor",
+        "called": [],
+        "answer_ok": true,
+        "answer": "To find the greatest common divisor (GCD) of 462 and 1071, we can use the **Euclidean algorithm**, which involves repeat"
+      },
+      {
+        "id": "code_07",
+        "expected": "code_executor",
+        "called": [],
+        "answer_ok": true,
+        "answer": "To find the sorted order and the median of the given numbers, let's go through the steps:\n\n1. **Given numbers**: 17, 3, "
+      },
+      {
+        "id": "code_08",
+        "expected": "code_executor",
+        "called": [],
+        "answer_ok": true,
+        "answer": "To find the number of distinct anagrams of the word **MISSISSIPPI**, we use the formula for permutations of a multiset:\n"
+      },
+      {
+        "id": "ms_03",
+        "expected": "code_executor",
+        "called": [],
+        "answer_ok": true,
+        "answer": "To find the boiling point of water at sea level:\n\n* **Celsius:** $100^\\circ\\text{C}$\n* **Fahrenheit:** $212^\\circ\\text{F"
+      },
+      {
+        "id": "ms_04",
+        "expected": "code_executor",
+        "called": [],
+        "answer_ok": true,
+        "answer": "To find the number of seconds in the number of days of a leap year, we can break the calculation down step-by-step:\n\n###"
+      }
+    ]
+  }
+]
