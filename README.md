@@ -94,6 +94,56 @@ This project is configured for **Hugging Face Spaces (Docker)**.
 4. Add your `GROQ_API_KEY` in the Space's **Settings > Variables and secrets**. Also add `GEMINI_API_KEY` and `NVIDIA_API_KEY` to enable fallback, and `GOOGLE_API_KEY` / `GOOGLE_CSE_ID` for Google Search.
 5. The specific `Dockerfile` at the root will build the React frontend and serve it via FastAPI on port `7860`.
 
+## 📊 Evaluation
+
+The agent is measured, not asserted. `eval/` holds a 30-question golden set, the
+harness that runs it and the scorer that grades it. The rubric was **committed
+before the first API call** (`eval/RUBRIC.md`), so no metric could be shaped
+after seeing results.
+
+```bash
+python eval/run_eval.py --out eval/results/baseline.jsonl          # record
+python eval/run_eval.py --out eval/results/faulted.jsonl --fault-injection
+python eval/score.py eval/results/baseline.jsonl eval/results/faulted.jsonl
+```
+
+Recording and grading are separate on purpose: re-scoring never re-spends API
+quota, and the raw trajectories in `eval/results/` stay auditable.
+
+### Results
+
+| Metric | Baseline | Primary provider disabled |
+|---|---|---|
+| Correct tool selection | 24/30 (80.0%) | 23/30 (76.7%) |
+| Task success | 20/20 | 20/20 |
+| Completed | **30/30** | **30/30** |
+| Median latency | 2.67 s | 2.16 s |
+
+Fault injection patches the primary provider to fail on **every** call, so the
+agent falls through mid-run at each step. Groq served **0 calls** in that run;
+Gemini served 62 and NVIDIA 7.
+
+### What the numbers do and do not say
+
+- **Task success is 20 of 30, not 30 of 30.** Six questions have no stable
+  target ("current population of Birmingham"). Four more have targets a pass
+  would not demonstrate — `code_07` asks for the median of a list containing the
+  answer; `doc_04` and `doc_06` have targets appearing in the papers' own
+  titles; `doc_05`'s target is just the ONNX acronym expansion. All ten were
+  answered correctly; the test cannot prove four of them, so `score.py` excludes
+  them automatically and prints why.
+- **Failover costs tail latency, not correctness.** The 5 of 30 requests that
+  reached the third provider took 15–24.5 s while the median held at 2.2 s.
+- **The failover path is not an emergency path.** Provider instrumentation shows
+  the primary was rate-limited on 35 of its 82 call attempts even in the
+  baseline run.
+- **The tool-selection gap is a routing preference, not an error.** Every miss is
+  the agent answering easy arithmetic (GCD, median of 7 numbers) from reasoning
+  instead of executing code — and getting it right. The fallback model does this
+  more: 7 of 30 questions with no tool call against the primary's 4.
+- **n = 30.** Differences of a few points are noise, and latency is a property of
+  free-tier endpoints on home broadband.
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please fork the repository and submit a Pull Request.
